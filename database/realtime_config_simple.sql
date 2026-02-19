@@ -1,10 +1,8 @@
 -- ============================================
--- REAL-TIME DATABASE CONFIGURATION
+-- REAL-TIME DATABASE CONFIGURATION (SIMPLE)
 -- SeaFarm Monitoring Application
+-- Version simplifiée sans politiques RLS complexes
 -- ============================================
-
--- This file contains SQL commands to enable Real-time functionality
--- for critical tables in the SeaFarm application.
 
 -- ============================================
 -- ENABLE REAL-TIME REPLICATION
@@ -91,7 +89,7 @@ CREATE TRIGGER realtime_notify_site_transfers
   FOR EACH ROW EXECUTE FUNCTION notify_realtime_change();
 
 -- ============================================
--- REAL-TIME PRESENCE TRACKING
+-- REAL-TIME PRESENCE TRACKING (SIMPLE)
 -- ============================================
 
 -- Table to track online users (for collaborative features)
@@ -107,12 +105,8 @@ CREATE TABLE IF NOT EXISTS user_presence (
 -- Enable RLS on presence table
 ALTER TABLE user_presence ENABLE ROW LEVEL SECURITY;
 
--- Policies for presence
-CREATE POLICY "Everyone can read presence" ON user_presence FOR SELECT USING (true);
-CREATE POLICY "Users can update own presence" ON user_presence 
-  FOR INSERT WITH CHECK (user_id = auth.uid());
-CREATE POLICY "Users can update own presence status" ON user_presence 
-  FOR UPDATE USING (user_id = auth.uid());
+-- Simple policies for presence (permissive for development)
+CREATE POLICY "Allow all access to user_presence" ON user_presence FOR ALL USING (true);
 
 -- Auto-cleanup stale presence (older than 5 minutes)
 CREATE OR REPLACE FUNCTION cleanup_stale_presence()
@@ -129,16 +123,21 @@ $$ LANGUAGE plpgsql;
 ALTER PUBLICATION supabase_realtime ADD TABLE user_presence;
 
 -- ============================================
--- REAL-TIME BROADCAST CHANNELS
+-- PERFORMANCE OPTIMIZATION FOR REAL-TIME
 -- ============================================
 
--- Broadcast channels can be created in the application code
--- Examples of channels to use:
--- - 'operations:{siteId}' - For site-specific operational updates
--- - 'inventory:{siteId}' - For site-specific inventory updates
--- - 'incidents' - For global incident alerts
--- - 'payments' - For payment processing updates
--- - 'notifications' - For global notifications
+-- Index for efficient presence queries
+CREATE INDEX IF NOT EXISTS idx_user_presence_status ON user_presence(status, last_seen);
+
+-- Partial indexes for active records only (better performance)
+CREATE INDEX IF NOT EXISTS idx_active_cultivation_cycles ON cultivation_cycles(status, planting_date) 
+  WHERE status IN ('PLANTED', 'GROWING');
+
+CREATE INDEX IF NOT EXISTS idx_active_incidents ON incidents(status, date) 
+  WHERE status IN ('OPEN', 'IN_PROGRESS');
+
+CREATE INDEX IF NOT EXISTS idx_active_site_transfers ON site_transfers(status, date) 
+  WHERE status IN ('AWAITING_OUTBOUND', 'IN_TRANSIT', 'PENDING_RECEPTION');
 
 -- ============================================
 -- COMMENTS AND DOCUMENTATION
@@ -149,72 +148,8 @@ COMMENT ON FUNCTION notify_realtime_change() IS 'Sends PostgreSQL notifications 
 COMMENT ON FUNCTION cleanup_stale_presence() IS 'Removes stale user presence records (call periodically)';
 
 -- ============================================
--- PERFORMANCE OPTIMIZATION FOR REAL-TIME
+-- END OF REAL-TIME CONFIGURATION (SIMPLE)
 -- ============================================
 
--- Index for efficient presence queries
-CREATE INDEX idx_user_presence_status ON user_presence(status, last_seen);
-
--- Partial indexes for active records only (better performance)
-CREATE INDEX idx_active_cultivation_cycles ON cultivation_cycles(status, planting_date) 
-  WHERE status IN ('PLANTED', 'GROWING');
-
-CREATE INDEX idx_active_incidents ON incidents(status, date) 
-  WHERE status IN ('OPEN', 'IN_PROGRESS');
-
-CREATE INDEX idx_active_site_transfers ON site_transfers(status, date) 
-  WHERE status IN ('AWAITING_OUTBOUND', 'IN_TRANSIT', 'PENDING_RECEPTION');
-
--- ============================================
--- REAL-TIME SUBSCRIPTION EXAMPLES (for documentation)
--- ============================================
-
-/*
-Example TypeScript code for subscribing to real-time changes:
-
-// Subscribe to all changes in modules table
-const modulesSubscription = supabase
-  .channel('modules-changes')
-  .on('postgres_changes', 
-    { event: '*', schema: 'public', table: 'modules' },
-    (payload) => {
-      console.log('Module changed:', payload);
-    }
-  )
-  .subscribe();
-
-// Subscribe to specific site's operations
-const siteOperationsSubscription = supabase
-  .channel(`operations:${siteId}`)
-  .on('postgres_changes',
-    { 
-      event: '*', 
-      schema: 'public', 
-      table: 'cultivation_cycles',
-      filter: `site_id=eq.${siteId}`
-    },
-    (payload) => {
-      console.log('Cycle changed:', payload);
-    }
-  )
-  .subscribe();
-
-// Broadcast presence updates
-const presenceChannel = supabase.channel('online-users')
-  .on('presence', { event: 'sync' }, () => {
-    const state = presenceChannel.presenceState();
-    console.log('Online users:', state);
-  })
-  .subscribe(async (status) => {
-    if (status === 'SUBSCRIBED') {
-      await presenceChannel.track({
-        user_id: currentUser.id,
-        online_at: new Date().toISOString(),
-      });
-    }
-  });
-*/
-
--- ============================================
--- END OF REAL-TIME CONFIGURATION
--- ============================================
+-- Note: Cette version utilise des politiques permissives (USING true)
+-- Pour la production, utilisez realtime_config.sql avec auth.uid()
