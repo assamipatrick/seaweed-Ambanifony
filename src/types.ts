@@ -113,7 +113,7 @@ export interface Site {
     code: string;
     location: string;
     managerId?: string;
-    zones: Zone[];
+    zones?: Zone[];
 }
 
 export type EmployeeType = 'PERMANENT' | 'CASUAL';

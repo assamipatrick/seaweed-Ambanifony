@@ -418,7 +418,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [pressingSlips, seaweedTypes]);
 
   const addSite = (site: Omit<Site, 'id'>) => {
-    const newSite = { ...site, id: crypto.randomUUID() };
+    const newSite = { ...site, id: crypto.randomUUID(), zones: site.zones || [] };
     // Update local state immediately (optimistic update)
     setSites(prev => [...prev, newSite]);
     // Sync to Supabase in background (non-blocking)

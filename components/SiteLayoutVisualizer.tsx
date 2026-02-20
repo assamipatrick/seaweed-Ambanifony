@@ -152,7 +152,7 @@ const SiteLayoutVisualizer: React.FC<SiteLayoutVisualizerProps> = ({ site, modul
       <div ref={mapContainerRef} style={{ height: '400px' }} className="rounded-lg mb-4 border border-gray-200 dark:border-gray-700 shadow-inner z-0" />
       
       <div className="flex flex-wrap gap-4 p-4 rounded-lg bg-gray-100 dark:bg-gray-900/50">
-        {site.zones.length > 0 ? site.zones.map((zone, index) => {
+        {site.zones && site.zones.length > 0 ? site.zones.map((zone, index) => {
           const zoneModules = modules.filter(m => m.zoneId === zone.id);
           const color = zoneColors[index % zoneColors.length];
           return (
