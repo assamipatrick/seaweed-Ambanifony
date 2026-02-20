@@ -9,6 +9,19 @@ import type {
   User, Invitation, MessageLog, GalleryPhoto
 } from '../types';
 
+// Helper: Transform camelCase keys to snake_case for Supabase
+function toSnakeCase(obj: any): any {
+  const result: any = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      // Convert camelCase to snake_case
+      const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      result[snakeKey] = obj[key];
+    }
+  }
+  return result;
+}
+
 // ============= SITES =============
 export async function fetchSites(): Promise<Site[]> {
   const { data, error } = await supabase.from('sites').select('*').order('name');
@@ -17,16 +30,22 @@ export async function fetchSites(): Promise<Site[]> {
 }
 
 export async function addSite(site: Omit<Site, 'id'>): Promise<Site | null> {
-  const newSite = { id: generateId(), ...site };
+  // Remove fields not in Supabase DB schema
+  const { zones, ...dbFields } = site as any;
+  const newSite = { id: generateId(), ...dbFields };
+  
   const { data, error } = await supabase.from('sites').insert([newSite]).select().single();
   if (error) return handleSupabaseError(error, 'addSite');
   return data;
 }
 
 export async function updateSite(site: Site): Promise<Site | null> {
+  // Remove fields not in Supabase DB schema
+  const { zones, ...dbFields } = site as any;
+  
   const { data, error } = await supabase
     .from('sites')
-    .update(site)
+    .update(dbFields)
     .eq('id', site.id)
     .select()
     .single();
