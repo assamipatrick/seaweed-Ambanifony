@@ -7,90 +7,98 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set, get, onValue, off } from 'firebase/database';
 
-// Configuration Firebase (DEMO - ne fonctionnera pas sans vraies credentials)
+// Configuration Firebase
 const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY || "AIzaSyDEMO_KEY",
-  authDomain: "seafarm-demo.firebaseapp.com",
-  databaseURL: "https://seafarm-demo-default-rtdb.firebaseio.com",
-  projectId: "seafarm-demo",
-  storageBucket: "seafarm-demo.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890"
+  apiKey: "AIzaSyB58GKPIQvikVbaEeiyGNZHrtzFPRgb1UE",
+  authDomain: "seafarm-mntr.firebaseapp.com",
+  databaseURL: "https://seafarm-mntr-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "seafarm-mntr",
+  storageBucket: "seafarm-mntr.firebasestorage.app",
+  messagingSenderId: "860357255311",
+  appId: "1:860357255311:web:00d1f44c1940c3a64f50fa"
 };
 
-console.log('\n🔥 TEST DE CONFIGURATION FIREBASE');
+console.log('\n=== TEST DE CONFIGURATION FIREBASE ===');
 console.log('=' .repeat(70));
 
 try {
   // Initialize Firebase
-  console.log('\n1️⃣  Initialisation de Firebase...');
+  console.log('\n[1/5] Initialisation de Firebase...');
   const app = initializeApp(firebaseConfig);
-  console.log('   ✅ Firebase initialisé');
+  console.log('      OK - Firebase initialise');
   
   // Initialize Database
-  console.log('\n2️⃣  Connexion à Realtime Database...');
+  console.log('\n[2/5] Connexion a Realtime Database...');
   const database = getDatabase(app);
-  console.log('   ✅ Database connectée');
+  console.log('      OK - Database connectee');
   
   // Test d'écriture
-  console.log('\n3️⃣  Test d'écriture...');
+  console.log('\n[3/5] Test d\'ecriture...');
   const testRef = ref(database, 'test/connection');
   await set(testRef, {
     timestamp: Date.now(),
     message: 'Test de connexion Firebase',
     status: 'success'
   });
-  console.log('   ✅ Écriture réussie');
+  console.log('      OK - Ecriture reussie');
   
   // Test de lecture
-  console.log('\n4️⃣  Test de lecture...');
+  console.log('\n[4/5] Test de lecture...');
   const snapshot = await get(testRef);
   if (snapshot.exists()) {
-    console.log('   ✅ Lecture réussie');
-    console.log('   📄 Données:', snapshot.val());
+    console.log('      OK - Lecture reussie');
+    console.log('      Donnees:', JSON.stringify(snapshot.val(), null, 2));
   } else {
-    console.log('   ⚠️  Aucune donnée trouvée');
+    console.log('      WARN - Aucune donnee trouvee');
   }
   
   // Test de synchronisation temps réel
-  console.log('\n5️⃣  Test de synchronisation temps réel...');
+  console.log('\n[5/5] Test de synchronisation temps reel...');
   const sitesRef = ref(database, 'sites');
   
   onValue(sitesRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
       const count = Object.keys(data).length;
-      console.log(`   ✅ ${count} site(s) détecté(s) en temps réel`);
+      console.log(`      OK - ${count} site(s) detecte(s) en temps reel`);
     } else {
-      console.log('   ℹ️  Aucun site dans la base (normal pour une nouvelle DB)');
+      console.log('      INFO - Aucun site dans la base (normal pour une nouvelle DB)');
     }
     
     // Cleanup
     off(sitesRef);
     
     console.log('\n' + '='.repeat(70));
-    console.log('🎉 TOUS LES TESTS FIREBASE ONT RÉUSSI !');
+    console.log('SUCCESS - TOUS LES TESTS FIREBASE ONT REUSSI !');
     console.log('='.repeat(70));
-    console.log('\n📝 Prochaines étapes :');
-    console.log('   1. Créez un projet Firebase sur https://console.firebase.google.com/');
-    console.log('   2. Activez Realtime Database');
-    console.log('   3. Copiez vos credentials dans .env.local');
-    console.log('   4. Redémarrez l\'application : npm run dev');
-    console.log('\n📖 Guide complet : voir FIREBASE_SETUP.md\n');
+    console.log('\nProchaines etapes :');
+    console.log('  1. Demarrer l\'application : npm run dev');
+    console.log('  2. Se connecter : admin@seafarm.com / password');
+    console.log('  3. Ajouter un site et verifier dans Firebase Console');
+    console.log('\n');
     
     process.exit(0);
   }, (error) => {
-    console.error('   ❌ Erreur de synchronisation:', error.message);
+    console.error('      ERROR - Erreur de synchronisation:', error.message);
+    console.error('\nCauses possibles :');
+    console.error('  - Realtime Database pas activee dans Firebase Console');
+    console.error('  - Regles de securite trop restrictives');
+    console.error('  - URL de la database incorrecte');
+    console.error('\nSolution :');
+    console.error('  1. Aller sur https://console.firebase.google.com/project/seafarm-mntr/database');
+    console.error('  2. Cliquer sur "Create Database"');
+    console.error('  3. Choisir "Start in test mode"');
+    console.error('  4. Copier l\'URL de la database et la mettre dans .env.local\n');
     process.exit(1);
   });
   
 } catch (error) {
-  console.error('\n❌ ERREUR:', error.message);
-  console.error('\n💡 Causes possibles :');
-  console.error('   • Credentials Firebase invalides ou manquantes');
-  console.error('   • Realtime Database pas activée dans Firebase Console');
-  console.error('   • Règles de sécurité trop restrictives');
-  console.error('   • Connexion internet indisponible');
-  console.error('\n📖 Consultez FIREBASE_SETUP.md pour la configuration complète\n');
+  console.error('\nERROR:', error.message);
+  console.error('\nCauses possibles :');
+  console.error('  - Credentials Firebase invalides ou manquantes');
+  console.error('  - Realtime Database pas activee dans Firebase Console');
+  console.error('  - Connexion internet indisponible');
+  console.error('\nSolution :');
+  console.error('  Voir NEXT_STEP_ACTIVATE_RTDB.md pour activer Realtime Database\n');
   process.exit(1);
 }
