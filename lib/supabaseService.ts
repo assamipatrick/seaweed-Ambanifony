@@ -96,17 +96,26 @@ export async function fetchEmployees(): Promise<Employee[]> {
 }
 
 export async function addEmployee(employee: Omit<Employee, 'id'>): Promise<Employee | null> {
-  const newEmployee = { id: generateId(), ...employee };
+  // Clean empty strings and convert to snake_case
+  const cleanedFields = cleanUuidFields(employee as any);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  const newEmployee = { id: generateId(), ...snakeCaseFields };
+  
   const { data, error } = await supabase.from('employees').insert([newEmployee]).select().single();
   if (error) return handleSupabaseError(error, 'addEmployee');
   return data;
 }
 
 export async function updateEmployee(employee: Employee): Promise<Employee | null> {
+  // Extract id and clean/convert remaining fields
+  const { id, ...dbFields } = employee as any;
+  const cleanedFields = cleanUuidFields(dbFields);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  
   const { data, error } = await supabase
     .from('employees')
-    .update(employee)
-    .eq('id', employee.id)
+    .update(snakeCaseFields)
+    .eq('id', id)
     .select()
     .single();
   if (error) return handleSupabaseError(error, 'updateEmployee');
@@ -139,17 +148,26 @@ export async function fetchFarmers(): Promise<Farmer[]> {
 }
 
 export async function addFarmer(farmer: Omit<Farmer, 'id'>): Promise<Farmer | null> {
-  const newFarmer = { id: generateId(), ...farmer };
+  // Clean empty strings and convert to snake_case
+  const cleanedFields = cleanUuidFields(farmer as any);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  const newFarmer = { id: generateId(), ...snakeCaseFields };
+  
   const { data, error } = await supabase.from('farmers').insert([newFarmer]).select().single();
   if (error) return handleSupabaseError(error, 'addFarmer');
   return data;
 }
 
 export async function updateFarmer(farmer: Farmer): Promise<Farmer | null> {
+  // Extract id and clean/convert remaining fields
+  const { id, ...dbFields } = farmer as any;
+  const cleanedFields = cleanUuidFields(dbFields);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  
   const { data, error } = await supabase
     .from('farmers')
-    .update(farmer)
-    .eq('id', farmer.id)
+    .update(snakeCaseFields)
+    .eq('id', id)
     .select()
     .single();
   if (error) return handleSupabaseError(error, 'updateFarmer');
@@ -182,17 +200,26 @@ export async function fetchServiceProviders(): Promise<ServiceProvider[]> {
 }
 
 export async function addServiceProvider(provider: Omit<ServiceProvider, 'id'>): Promise<ServiceProvider | null> {
-  const newProvider = { id: generateId(), ...provider };
+  // Clean empty strings and convert to snake_case
+  const cleanedFields = cleanUuidFields(provider as any);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  const newProvider = { id: generateId(), ...snakeCaseFields };
+  
   const { data, error } = await supabase.from('service_providers').insert([newProvider]).select().single();
   if (error) return handleSupabaseError(error, 'addServiceProvider');
   return data;
 }
 
 export async function updateServiceProvider(provider: ServiceProvider): Promise<ServiceProvider | null> {
+  // Extract id and clean/convert remaining fields
+  const { id, ...dbFields } = provider as any;
+  const cleanedFields = cleanUuidFields(dbFields);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  
   const { data, error } = await supabase
     .from('service_providers')
-    .update(provider)
-    .eq('id', provider.id)
+    .update(snakeCaseFields)
+    .eq('id', id)
     .select()
     .single();
   if (error) return handleSupabaseError(error, 'updateServiceProvider');
@@ -216,17 +243,26 @@ export async function fetchCreditTypes(): Promise<CreditType[]> {
 }
 
 export async function addCreditType(creditType: Omit<CreditType, 'id'>): Promise<CreditType | null> {
-  const newCreditType = { id: generateId(), ...creditType };
+  // Clean empty strings and convert to snake_case
+  const cleanedFields = cleanUuidFields(creditType as any);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  const newCreditType = { id: generateId(), ...snakeCaseFields };
+  
   const { data, error } = await supabase.from('credit_types').insert([newCreditType]).select().single();
   if (error) return handleSupabaseError(error, 'addCreditType');
   return data;
 }
 
 export async function updateCreditType(creditType: CreditType): Promise<CreditType | null> {
+  // Extract id and clean/convert remaining fields
+  const { id, ...dbFields } = creditType as any;
+  const cleanedFields = cleanUuidFields(dbFields);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  
   const { data, error } = await supabase
     .from('credit_types')
-    .update(creditType)
-    .eq('id', creditType.id)
+    .update(snakeCaseFields)
+    .eq('id', id)
     .select()
     .single();
   if (error) return handleSupabaseError(error, 'updateCreditType');
@@ -250,17 +286,26 @@ export async function fetchSeaweedTypes(): Promise<SeaweedType[]> {
 }
 
 export async function addSeaweedType(seaweedType: Omit<SeaweedType, 'id'>): Promise<SeaweedType | null> {
-  const newType = { id: generateId(), ...seaweedType };
+  // Clean empty strings and convert to snake_case
+  const cleanedFields = cleanUuidFields(seaweedType as any);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  const newType = { id: generateId(), ...snakeCaseFields };
+  
   const { data, error } = await supabase.from('seaweed_types').insert([newType]).select().single();
   if (error) return handleSupabaseError(error, 'addSeaweedType');
   return data;
 }
 
 export async function updateSeaweedType(seaweedType: SeaweedType): Promise<SeaweedType | null> {
+  // Extract id and clean/convert remaining fields
+  const { id, ...dbFields } = seaweedType as any;
+  const cleanedFields = cleanUuidFields(dbFields);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  
   const { data, error } = await supabase
     .from('seaweed_types')
-    .update(seaweedType)
-    .eq('id', seaweedType.id)
+    .update(snakeCaseFields)
+    .eq('id', id)
     .select()
     .single();
   if (error) return handleSupabaseError(error, 'updateSeaweedType');
@@ -284,17 +329,26 @@ export async function fetchModules(): Promise<Module[]> {
 }
 
 export async function addModule(module: Omit<Module, 'id'>): Promise<Module | null> {
-  const newModule = { id: generateId(), ...module };
+  // Clean empty strings and convert to snake_case
+  const cleanedFields = cleanUuidFields(module as any);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  const newModule = { id: generateId(), ...snakeCaseFields };
+  
   const { data, error } = await supabase.from('modules').insert([newModule]).select().single();
   if (error) return handleSupabaseError(error, 'addModule');
   return data;
 }
 
 export async function updateModule(module: Module): Promise<Module | null> {
+  // Extract id and clean/convert remaining fields
+  const { id, ...dbFields } = module as any;
+  const cleanedFields = cleanUuidFields(dbFields);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  
   const { data, error } = await supabase
     .from('modules')
-    .update(module)
-    .eq('id', module.id)
+    .update(snakeCaseFields)
+    .eq('id', id)
     .select()
     .single();
   if (error) return handleSupabaseError(error, 'updateModule');
@@ -327,17 +381,26 @@ export async function fetchCultivationCycles(): Promise<CultivationCycle[]> {
 }
 
 export async function addCultivationCycle(cycle: Omit<CultivationCycle, 'id'>): Promise<CultivationCycle | null> {
-  const newCycle = { id: generateId(), ...cycle };
+  // Clean empty strings and convert to snake_case
+  const cleanedFields = cleanUuidFields(cycle as any);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  const newCycle = { id: generateId(), ...snakeCaseFields };
+  
   const { data, error } = await supabase.from('cultivation_cycles').insert([newCycle]).select().single();
   if (error) return handleSupabaseError(error, 'addCultivationCycle');
   return data;
 }
 
 export async function updateCultivationCycle(cycle: CultivationCycle): Promise<CultivationCycle | null> {
+  // Extract id and clean/convert remaining fields
+  const { id, ...dbFields } = cycle as any;
+  const cleanedFields = cleanUuidFields(dbFields);
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  
   const { data, error } = await supabase
     .from('cultivation_cycles')
-    .update(cycle)
-    .eq('id', cycle.id)
+    .update(snakeCaseFields)
+    .eq('id', id)
     .select()
     .single();
   if (error) return handleSupabaseError(error, 'updateCultivationCycle');
