@@ -144,7 +144,7 @@ const SiteManagement: React.FC = () => {
 
 const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site | null, onSave: (data: any) => void }> = ({ isOpen, onClose, site, onSave }) => {
     const { t } = useLocalization();
-    const { employees, sites } = useData();
+    const { employees, sites, zones } = useData();
     const { settings } = useSettings();
     
     const [formData, setFormData] = useState<Omit<Site, 'id'>>({
@@ -155,7 +155,7 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
     const [errors, setErrors] = useState<Record<string, any>>({});
     
     // Zone editing state
-    const [zones, setZones] = useState<Zone[]>([]);
+    const [formZones, setFormZones] = useState<Zone[]>([]);
 
     const validate = useCallback(() => {
         const newErrors: Record<string, any> = {};
@@ -202,14 +202,23 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
 
     useEffect(() => {
         if (site) {
+            // Hydrate site zones if they are IDs
+            let hydratedZones = site.zones || [];
+            if (hydratedZones.length > 0 && typeof hydratedZones[0] === 'string') {
+                // Zones are IDs, hydrate them
+                hydratedZones = hydratedZones
+                    .map((zoneId: any) => zones.find(z => z.id === zoneId))
+                    .filter((z: any) => z !== undefined);
+            }
+            
             setFormData({
                 name: site.name,
                 code: site.code,
                 location: site.location,
                 managerId: site.managerId || '',
-                zones: site.zones || []
+                zones: hydratedZones
             });
-            setZones(site.zones || []);
+            setFormZones(hydratedZones);
             if (site.location) {
                 const parts = site.location.split(',');
                 if (parts.length === 2) {
@@ -219,11 +228,11 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
             }
         } else {
             setFormData({ name: '', code: '', location: '', managerId: '', zones: [] });
-            setZones([]);
+            setFormZones([]);
             setLatitude('');
             setLongitude('');
         }
-    }, [site, isOpen]);
+    }, [site, isOpen, zones]);
 
     const generateUniqueCode = (name: string): string => {
         // Remove non-alphabetic characters and convert to uppercase
@@ -277,14 +286,14 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
     const handleAddZone = () => {
         const newZone: Zone = {
             id: `zone-${Date.now()}`,
-            name: `Zone ${zones.length + 1}`,
+            name: `Zone ${formZones.length + 1}`,
             geoPoints: []
         };
-        setZones([...zones, newZone]);
+        setFormZones([...formZones, newZone]);
     };
 
     const handleZoneChange = (index: number, field: keyof Zone, value: any) => {
-        setZones(prevZones => {
+        setFormZones(prevZones => {
             const newZones = [...prevZones];
             newZones[index] = { ...newZones[index], [field]: value };
             return newZones;
@@ -292,12 +301,12 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
     };
     
     const handleDeleteZone = (index: number) => {
-        setZones(zones.filter((_, i) => i !== index));
+        setFormZones(formZones.filter((_, i) => i !== index));
     };
 
     // GeoPoints Management for a specific zone
     const handleAddGeoPoint = (zoneIndex: number) => {
-        setZones(prevZones => {
+        setFormZones(prevZones => {
             const newZones = [...prevZones];
             const targetZone = { ...newZones[zoneIndex] };
             targetZone.geoPoints = [...targetZone.geoPoints, ''];
@@ -307,7 +316,7 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
     };
 
     const handleGeoPointChange = (zoneIndex: number, pointIndex: number, value: string) => {
-        setZones(prevZones => {
+        setFormZones(prevZones => {
             const newZones = [...prevZones];
             const targetZone = { ...newZones[zoneIndex] };
             const newGeoPoints = [...targetZone.geoPoints];
@@ -319,7 +328,7 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
     };
     
     const handleRemoveGeoPoint = (zoneIndex: number, pointIndex: number) => {
-        setZones(prevZones => {
+        setFormZones(prevZones => {
             const newZones = [...prevZones];
             const targetZone = { ...newZones[zoneIndex] };
             targetZone.geoPoints = targetZone.geoPoints.filter((_, i) => i !== pointIndex);
@@ -386,7 +395,7 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
                     </div>
                     
                     <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2">
-                        {zones.map((zone, index) => (
+                        {formZones.map((zone, index) => (
                             <div key={zone.id} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700 relative">
                                 <Button variant="danger" className="absolute top-2 right-2 p-1" onClick={() => handleDeleteZone(index)}><Icon name="X" className="w-4 h-4"/></Button>
                                 <div className="mb-3 pr-8">
