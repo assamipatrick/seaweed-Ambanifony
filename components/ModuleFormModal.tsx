@@ -21,7 +21,7 @@ interface ModuleFormModalProps {
   
 const ModuleFormModal: React.FC<ModuleFormModalProps> = ({ isOpen, onClose, data, onSave }) => {
     const { t } = useLocalization();
-    const { sites, modules, cultivationCycles } = useData();
+    const { sites, modules, cultivationCycles, zones } = useData();
     const [moduleCode, setModuleCode] = useState('');
     const [formData, setFormData] = useState({
         siteId: '',
@@ -111,15 +111,31 @@ const ModuleFormModal: React.FC<ModuleFormModalProps> = ({ isOpen, onClose, data
 
     useEffect(() => {
         const selectedSite = sites.find(s => s.id === formData.siteId);
-        setFilteredZones(selectedSite?.zones || []);
-    }, [formData.siteId, sites]);
+        if (!selectedSite?.zones) {
+            setFilteredZones([]);
+            return;
+        }
+        
+        // Hydrate zones if they are IDs
+        const hydratedZones = selectedSite.zones
+            .map(zoneIdOrObj => {
+                if (typeof zoneIdOrObj === 'object' && 'name' in zoneIdOrObj) {
+                    return zoneIdOrObj;
+                }
+                return zones.find(z => z.id === zoneIdOrObj);
+            })
+            .filter((z): z is Zone => z !== undefined);
+        
+        setFilteredZones(hydratedZones);
+    }, [formData.siteId, sites, zones]);
     
     useEffect(() => {
         // This effect auto-generates a unique module code when creating a module
         // or when an existing module is moved to a new site or zone.
         if (formData.siteId && formData.zoneId) {
             const site = sites.find(s => s.id === formData.siteId);
-            const zone = site?.zones.find(z => z.id === formData.zoneId);
+            // Find zone from the zones list directly instead of site.zones
+            const zone = zones.find(z => z.id === formData.zoneId);
             
             if (site && zone) {
                 const siteCode = site.code || 'SITE';
@@ -163,7 +179,7 @@ const ModuleFormModal: React.FC<ModuleFormModalProps> = ({ isOpen, onClose, data
             // Clear code if no site/zone when adding a new module
             setModuleCode('');
         }
-    }, [data, formData.siteId, formData.zoneId, sites, modules]);
+    }, [data, formData.siteId, formData.zoneId, sites, modules, zones]);
 
     useEffect(() => { setErrors(validate()) }, [formData, validate]);
 
