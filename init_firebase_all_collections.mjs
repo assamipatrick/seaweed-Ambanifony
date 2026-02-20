@@ -359,6 +359,12 @@ const completeData = {
       name: 'Zone Nord',
       siteId: ids.site1,
       description: 'Zone principale Nord',
+      geoPoints: [
+        "18° 46' 30.00\" S, 46° 51' 00.00\" E",
+        "18° 46' 45.00\" S, 46° 51' 15.00\" E",
+        "18° 47' 00.00\" S, 46° 51' 00.00\" E",
+        "18° 46' 45.00\" S, 46° 50' 45.00\" E"
+      ],
       createdAt: new Date().toISOString()
     },
     [ids.zone2]: {
@@ -367,6 +373,12 @@ const completeData = {
       name: 'Zone Sud',
       siteId: ids.site1,
       description: 'Zone secondaire Sud',
+      geoPoints: [
+        "18° 47' 15.00\" S, 46° 51' 00.00\" E",
+        "18° 47' 30.00\" S, 46° 51' 15.00\" E",
+        "18° 47' 45.00\" S, 46° 51' 00.00\" E",
+        "18° 47' 30.00\" S, 46° 50' 45.00\" E"
+      ],
       createdAt: new Date().toISOString()
     },
     [ids.zone3]: {
@@ -375,6 +387,12 @@ const completeData = {
       name: 'Zone Est',
       siteId: ids.site2,
       description: 'Zone côtière Est',
+      geoPoints: [
+        "19° 52' 30.00\" S, 48° 48' 00.00\" E",
+        "19° 52' 45.00\" S, 48° 48' 15.00\" E",
+        "19° 53' 00.00\" S, 48° 48' 00.00\" E",
+        "19° 52' 45.00\" S, 48° 47' 45.00\" E"
+      ],
       createdAt: new Date().toISOString()
     }
   },

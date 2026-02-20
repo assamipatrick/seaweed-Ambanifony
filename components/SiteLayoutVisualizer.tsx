@@ -64,6 +64,12 @@ const SiteLayoutVisualizer: React.FC<SiteLayoutVisualizerProps> = ({ site, modul
     // --- DRAW ZONES ---
     if (site.zones && site.zones.length > 0) {
         site.zones.forEach((zone, index) => {
+            // Protection: s'assurer que geoPoints existe et est un tableau
+            if (!zone.geoPoints || !Array.isArray(zone.geoPoints)) {
+                console.warn(`Zone ${zone.name} n'a pas de geoPoints valides`);
+                return;
+            }
+            
             const coordsXY = convertGeoPointsToXY(zone.geoPoints);
             if (coordsXY.length >= 3) {
                 // Sort points by angle around their centroid to ensure they form a simple, non-self-intersecting polygon.
