@@ -1,9 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { subscribeToCollection } from '../lib/firebaseService';
+import { ref, set } from 'firebase/database';
+import { database } from '../lib/firebaseConfig';
 
 /**
  * Hook to sync ALL collections with Firebase Realtime Database
- * Provides real-time synchronization for all 26 entities
+ * Provides real-time synchronization for all 27 entities
+ * 
+ * **SYNC STRATEGY**:
+ * 1. On mount: Subscribe to Firebase for real-time updates
+ * 2. If Firebase is empty BUT local data exists → Upload local to Firebase
+ * 3. If Firebase has data → Update local state
+ * 4. All local changes (add/update/delete) are synced via DataContext functions
  */
 
 interface CollectionConfig<T> {
@@ -30,25 +38,41 @@ interface UseFirebaseSyncProps {
  * ```
  */
 export function useFirebaseSync({ collections }: UseFirebaseSyncProps) {
+  const syncedRef = useRef(false);
   
   useEffect(() => {
     const unsubscribers: (() => void)[] = [];
     
     // Subscribe to all collections
-    collections.forEach(({ collectionName, setData }) => {
+    collections.forEach(({ collectionName, data, setData }) => {
       console.log(`[Firebase] Setting up real-time subscription for ${collectionName}...`);
       
-      const unsubscribe = subscribeToCollection<any>(collectionName, (data) => {
-        console.log(`[Firebase] Received ${data.length} ${collectionName} from Firebase`);
-        if (data.length > 0) {
-          setData(data);
-        } else {
-          console.log(`[Firebase] No ${collectionName} in Firebase, keeping local data`);
+      const unsubscribe = subscribeToCollection<any>(collectionName, (firebaseData) => {
+        console.log(`[Firebase] Received ${firebaseData.length} ${collectionName} from Firebase`);
+        
+        if (firebaseData.length > 0) {
+          // Firebase has data → Update local state
+          setData(firebaseData);
+        } else if (data.length > 0 && !syncedRef.current) {
+          // Firebase is empty BUT we have local data → Upload to Firebase
+          console.log(`[Firebase] Uploading ${data.length} local ${collectionName} to Firebase...`);
+          const collectionRef = ref(database, collectionName);
+          const firebaseObject: Record<string, any> = {};
+          data.forEach((item: any) => {
+            const { id, ...rest } = item;
+            firebaseObject[id] = { ...rest };
+          });
+          set(collectionRef, firebaseObject)
+            .then(() => console.log(`[Firebase] ✅ Uploaded ${data.length} ${collectionName} to Firebase`))
+            .catch((err) => console.error(`[Firebase] ❌ Failed to upload ${collectionName}:`, err));
         }
       });
       
       unsubscribers.push(unsubscribe);
     });
+    
+    // Mark as synced after first setup
+    syncedRef.current = true;
     
     // Cleanup all subscriptions on unmount
     return () => {

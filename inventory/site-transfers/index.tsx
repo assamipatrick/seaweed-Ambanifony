@@ -25,15 +25,15 @@ const SiteTransfers: React.FC = () => {
     const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
     const siteMap = useMemo(() => {
-        const map = new Map(sites.map(s => [s.id, s.name]));
+        const map = new Map((sites || []).map(s => [s.id, s.name]));
         map.set('pressing-warehouse', t('pressedWarehouseTitle'));
         return map;
     }, [sites, t]);
 
-    const seaweedTypeMap = useMemo(() => new Map(seaweedTypes.map(st => [st.id, st.name])), [seaweedTypes]);
+    const seaweedTypeMap = useMemo(() => new Map((seaweedTypes || []).map(st => [st.id, st.name])), [seaweedTypes]);
 
     const sortedTransfers = useMemo(() => {
-        let sortableItems = [...siteTransfers];
+        let sortableItems = [...(siteTransfers || [])];
         sortableItems.sort((a, b) => {
             let valA, valB;
             if (sortConfig.key === 'sourceSiteName') valA = siteMap.get(a.sourceSiteId) || '';
@@ -182,7 +182,7 @@ const SiteTransfers: React.FC = () => {
                                         <td className="p-3">{siteMap.get(transfer.sourceSiteId) || t('unknown')}</td>
                                         <td className="p-3">{siteMap.get(transfer.destinationSiteId) || t('unknown')}</td>
                                         <td className="p-3">{seaweedTypeMap.get(transfer.seaweedTypeId) || t('unknown')}</td>
-                                        <td className="p-3 text-right font-medium">{transfer.weightKg.toFixed(2)}</td>
+                                        <td className="p-3 text-right font-medium">{(transfer.weightKg || 0).toFixed(2)}</td>
                                         <td className="p-3"><StatusBadge status={transfer.status} /></td>
                                         <td className="p-3 text-right">
                                             {renderActions(transfer)}
