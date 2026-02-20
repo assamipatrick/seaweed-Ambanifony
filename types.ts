@@ -114,7 +114,7 @@ export interface Site {
     code: string;
     location: string;
     managerId?: string;
-    zones: Zone[];
+    zones?: Zone[]; // Optional: some sites may not have zones defined
 }
 
 export type EmployeeType = 'PERMANENT' | 'CASUAL';

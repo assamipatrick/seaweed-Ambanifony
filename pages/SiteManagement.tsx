@@ -84,7 +84,7 @@ const SiteManagement: React.FC = () => {
                             <div className="mt-4 border-t dark:border-gray-700 pt-4">
                                 <h4 className="font-semibold mb-2">{t('zones')}</h4>
                                 <div className="flex flex-wrap gap-2">
-                                    {site.zones.length > 0 ? site.zones.map(z => (
+                                    {site.zones && site.zones.length > 0 ? site.zones.map(z => (
                                         <span key={z.id} className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded text-sm border border-blue-200 dark:border-blue-800">
                                             {z.name}
                                         </span>
@@ -183,9 +183,9 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
                 code: site.code,
                 location: site.location,
                 managerId: site.managerId || '',
-                zones: site.zones
+                zones: site.zones || []
             });
-            setZones(site.zones);
+            setZones(site.zones || []);
             if (site.location) {
                 const parts = site.location.split(',');
                 if (parts.length === 2) {
