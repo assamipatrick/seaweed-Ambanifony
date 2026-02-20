@@ -34,6 +34,30 @@ const FarmMap: React.FC = () => {
     const [selectedModuleData, setSelectedModuleData] = useState<CombinedModuleData | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
 
+    // Hydrate sites with full zone objects
+    const hydratedSites = React.useMemo(() => {
+        return sites.map(site => {
+            if (!site.zones || !Array.isArray(site.zones)) return site;
+            
+            // If zones are IDs (strings), hydrate them with full zone objects
+            const hydratedZones = site.zones
+                .map(zoneIdOrObj => {
+                    // Already a full object?
+                    if (typeof zoneIdOrObj === 'object' && 'name' in zoneIdOrObj) {
+                        return zoneIdOrObj;
+                    }
+                    // It's an ID, find the full zone object
+                    return zones.find(z => z.id === zoneIdOrObj);
+                })
+                .filter((z): z is any => z !== undefined);
+            
+            return {
+                ...site,
+                zones: hydratedZones
+            };
+        });
+    }, [sites, zones]);
+
     const getModuleStatusInfo = (module: any, cycle: any) => {
         if (!module) return { color: '#808080', label: 'Unknown' };
         
@@ -146,7 +170,7 @@ const FarmMap: React.FC = () => {
         const allBoundsPoints: [number, number][] = [];
 
         // --- SITES ---
-        sites.forEach(site => {
+        hydratedSites.forEach(site => {
             if (site.location) {
                 try {
                     const parts = site.location.split(',');
@@ -217,12 +241,7 @@ const FarmMap: React.FC = () => {
     
             // --- ZONES ---
             const siteZones = site.zones || [];
-            siteZones.forEach(zoneIdOrObj => {
-                // Hydrate zone if it's just an ID
-                const zone = typeof zoneIdOrObj === 'string' 
-                    ? zones.find(z => z.id === zoneIdOrObj)
-                    : zoneIdOrObj;
-                
+            siteZones.forEach(zone => {
                 // Skip if zone not found or no geoPoints
                 if (!zone || !zone.geoPoints || !Array.isArray(zone.geoPoints)) {
                     return;
@@ -323,7 +342,7 @@ const FarmMap: React.FC = () => {
             map.fitBounds(allBoundsPoints, { padding: [50, 50] });
         }
 
-    }, [sites, modules, cultivationCycles, farmers, employees, seaweedTypes, t, format]);
+    }, [hydratedSites, modules, cultivationCycles, farmers, employees, seaweedTypes, t, format]);
 
 
     // 3. Highlight Effect

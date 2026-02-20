@@ -241,7 +241,7 @@ const ModuleFormModal: React.FC<ModuleFormModalProps> = ({ isOpen, onClose, data
                         {sites.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </Select>
                     <Select label={t('zoneName')} value={formData.zoneId} onChange={e => handleChange('zoneId', e.target.value)} error={errors.zoneId} disabled={!formData.siteId}>
-                         <option value="">{t('selectZone')}</option>
+                         <option key="" value="">{t('selectZone')}</option>
                         {filteredZones.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
                     </Select>
                 </div>
