@@ -65,8 +65,9 @@ const SiteLayoutVisualizer: React.FC<SiteLayoutVisualizerProps> = ({ site, modul
     if (site.zones && site.zones.length > 0) {
         site.zones.forEach((zone, index) => {
             // Protection: s'assurer que geoPoints existe et est un tableau
-            if (!zone.geoPoints || !Array.isArray(zone.geoPoints)) {
-                console.warn(`Zone ${zone.name} n'a pas de geoPoints valides`);
+            // GeoPoints vides sont autorisés - on saute juste le rendu de la zone
+            if (!zone.geoPoints || !Array.isArray(zone.geoPoints) || zone.geoPoints.length === 0) {
+                // Zone sans geoPoints - normal, pas besoin de warning
                 return;
             }
             
