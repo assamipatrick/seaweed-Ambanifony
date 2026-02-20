@@ -36,6 +36,11 @@ const FarmMap: React.FC = () => {
 
     // Hydrate sites with full zone objects
     const hydratedSites = React.useMemo(() => {
+        // Don't process if zones are not loaded yet
+        if (!zones || zones.length === 0) {
+            return sites;
+        }
+        
         return sites.map(site => {
             if (!site.zones || !Array.isArray(site.zones)) return site;
             
@@ -43,11 +48,14 @@ const FarmMap: React.FC = () => {
             const hydratedZones = site.zones
                 .map(zoneIdOrObj => {
                     // Already a full object?
-                    if (typeof zoneIdOrObj === 'object' && 'name' in zoneIdOrObj) {
+                    if (typeof zoneIdOrObj === 'object' && zoneIdOrObj && 'name' in zoneIdOrObj) {
                         return zoneIdOrObj;
                     }
                     // It's an ID, find the full zone object
-                    return zones.find(z => z.id === zoneIdOrObj);
+                    if (typeof zoneIdOrObj === 'string') {
+                        return zones.find(z => z.id === zoneIdOrObj);
+                    }
+                    return undefined;
                 })
                 .filter((z): z is any => z !== undefined);
             
@@ -242,8 +250,13 @@ const FarmMap: React.FC = () => {
             // --- ZONES ---
             const siteZones = site.zones || [];
             siteZones.forEach(zone => {
+                // Skip if zone is undefined, null, or just an ID string
+                if (!zone || typeof zone === 'string') {
+                    return;
+                }
+                
                 // Skip if zone not found or no geoPoints
-                if (!zone || !zone.geoPoints || !Array.isArray(zone.geoPoints)) {
+                if (!zone.geoPoints || !Array.isArray(zone.geoPoints)) {
                     return;
                 }
                 
