@@ -22,6 +22,19 @@ function toSnakeCase(obj: any): any {
   return result;
 }
 
+// Helper: Convert empty strings to null for UUID fields
+function cleanUuidFields(obj: any): any {
+  const result: any = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const value = obj[key];
+      // Convert empty strings to null (for UUID fields)
+      result[key] = value === '' ? null : value;
+    }
+  }
+  return result;
+}
+
 // ============= SITES =============
 export async function fetchSites(): Promise<Site[]> {
   const { data, error } = await supabase.from('sites').select('*').order('name');
@@ -32,7 +45,13 @@ export async function fetchSites(): Promise<Site[]> {
 export async function addSite(site: Omit<Site, 'id'>): Promise<Site | null> {
   // Remove fields not in Supabase DB schema and convert to snake_case
   const { zones, ...dbFields } = site as any;
-  const snakeCaseFields = toSnakeCase(dbFields);
+  
+  // Clean empty strings (convert to null for UUID fields)
+  const cleanedFields = cleanUuidFields(dbFields);
+  
+  // Convert camelCase to snake_case
+  const snakeCaseFields = toSnakeCase(cleanedFields);
+  
   const newSite = { id: generateId(), ...snakeCaseFields };
   
   const { data, error } = await supabase.from('sites').insert([newSite]).select().single();
@@ -43,7 +62,12 @@ export async function addSite(site: Omit<Site, 'id'>): Promise<Site | null> {
 export async function updateSite(site: Site): Promise<Site | null> {
   // Remove fields not in Supabase DB schema and convert to snake_case
   const { id, zones, ...dbFields } = site as any;
-  const snakeCaseFields = toSnakeCase(dbFields);
+  
+  // Clean empty strings (convert to null for UUID fields)
+  const cleanedFields = cleanUuidFields(dbFields);
+  
+  // Convert camelCase to snake_case
+  const snakeCaseFields = toSnakeCase(cleanedFields);
   
   const { data, error } = await supabase
     .from('sites')
