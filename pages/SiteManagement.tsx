@@ -308,8 +308,9 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
     const handleAddGeoPoint = (zoneIndex: number) => {
         setFormZones(prevZones => {
             const newZones = [...prevZones];
+            if (!newZones[zoneIndex]) return prevZones; // Protection
             const targetZone = { ...newZones[zoneIndex] };
-            targetZone.geoPoints = [...targetZone.geoPoints, ''];
+            targetZone.geoPoints = [...(targetZone.geoPoints || []), ''];
             newZones[zoneIndex] = targetZone;
             return newZones;
         });
@@ -318,8 +319,9 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
     const handleGeoPointChange = (zoneIndex: number, pointIndex: number, value: string) => {
         setFormZones(prevZones => {
             const newZones = [...prevZones];
+            if (!newZones[zoneIndex]) return prevZones; // Protection
             const targetZone = { ...newZones[zoneIndex] };
-            const newGeoPoints = [...targetZone.geoPoints];
+            const newGeoPoints = [...(targetZone.geoPoints || [])];
             newGeoPoints[pointIndex] = value;
             targetZone.geoPoints = newGeoPoints;
             newZones[zoneIndex] = targetZone;
@@ -330,8 +332,9 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
     const handleRemoveGeoPoint = (zoneIndex: number, pointIndex: number) => {
         setFormZones(prevZones => {
             const newZones = [...prevZones];
+            if (!newZones[zoneIndex]) return prevZones; // Protection
             const targetZone = { ...newZones[zoneIndex] };
-            targetZone.geoPoints = targetZone.geoPoints.filter((_, i) => i !== pointIndex);
+            targetZone.geoPoints = (targetZone.geoPoints || []).filter((_, i) => i !== pointIndex);
             newZones[zoneIndex] = targetZone;
             return newZones;
         });
