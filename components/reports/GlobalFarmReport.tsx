@@ -845,7 +845,7 @@ const Page2: FC<any> = ({ period, employees, sites, roles, page, totalPages, mon
         if (!monthlyPayments) return map;
 
         const periodForFilter = `${year}-${String(month + 1).padStart(2, '0')}`;
-        const relevantPayments = monthlyPayments.filter(p => p.period.startsWith(periodForFilter) && p.recipientType === RecipientType.EMPLOYEE);
+        const relevantPayments = monthlyPayments.filter(p => p.period?.startsWith(periodForFilter) && p.recipientType === RecipientType.EMPLOYEE);
 
         relevantPayments.forEach(p => {
             try {
