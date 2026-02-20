@@ -151,6 +151,13 @@ export async function addFarmer(farmer: Omit<Farmer, 'id'>): Promise<Farmer | nu
   // Clean empty strings and convert to snake_case
   const cleanedFields = cleanUuidFields(farmer as any);
   const snakeCaseFields = toSnakeCase(cleanedFields);
+  
+  // Validate that site_id is provided (NOT NULL constraint in DB)
+  if (!snakeCaseFields.site_id) {
+    console.error('[addFarmer] Farmer requires site_id (NOT NULL constraint)');
+    return null;
+  }
+  
   const newFarmer = { id: generateId(), ...snakeCaseFields };
   
   const { data, error } = await supabase.from('farmers').insert([newFarmer]).select().single();
@@ -286,8 +293,11 @@ export async function fetchSeaweedTypes(): Promise<SeaweedType[]> {
 }
 
 export async function addSeaweedType(seaweedType: Omit<SeaweedType, 'id'>): Promise<SeaweedType | null> {
+  // Remove fields that don't exist in DB (code, growthCycleDays)
+  const { code, growthCycleDays, ...dbFields } = seaweedType as any;
+  
   // Clean empty strings and convert to snake_case
-  const cleanedFields = cleanUuidFields(seaweedType as any);
+  const cleanedFields = cleanUuidFields(dbFields);
   const snakeCaseFields = toSnakeCase(cleanedFields);
   const newType = { id: generateId(), ...snakeCaseFields };
   
@@ -297,8 +307,8 @@ export async function addSeaweedType(seaweedType: Omit<SeaweedType, 'id'>): Prom
 }
 
 export async function updateSeaweedType(seaweedType: SeaweedType): Promise<SeaweedType | null> {
-  // Extract id and clean/convert remaining fields
-  const { id, ...dbFields } = seaweedType as any;
+  // Extract id and remove fields that don't exist in DB
+  const { id, code, growthCycleDays, ...dbFields } = seaweedType as any;
   const cleanedFields = cleanUuidFields(dbFields);
   const snakeCaseFields = toSnakeCase(cleanedFields);
   
@@ -329,9 +339,19 @@ export async function fetchModules(): Promise<Module[]> {
 }
 
 export async function addModule(module: Omit<Module, 'id'>): Promise<Module | null> {
+  // Remove managerId which doesn't exist in DB
+  const { managerId, ...dbFields } = module as any;
+  
   // Clean empty strings and convert to snake_case
-  const cleanedFields = cleanUuidFields(module as any);
+  const cleanedFields = cleanUuidFields(dbFields);
   const snakeCaseFields = toSnakeCase(cleanedFields);
+  
+  // Validate that site_id and zone_id are provided (NOT NULL in DB)
+  if (!snakeCaseFields.site_id || !snakeCaseFields.zone_id) {
+    console.error('[addModule] Module requires site_id and zone_id (NOT NULL constraints)');
+    return null;
+  }
+  
   const newModule = { id: generateId(), ...snakeCaseFields };
   
   const { data, error } = await supabase.from('modules').insert([newModule]).select().single();
@@ -340,8 +360,8 @@ export async function addModule(module: Omit<Module, 'id'>): Promise<Module | nu
 }
 
 export async function updateModule(module: Module): Promise<Module | null> {
-  // Extract id and clean/convert remaining fields
-  const { id, ...dbFields } = module as any;
+  // Extract id and remove managerId which doesn't exist in DB
+  const { id, managerId, ...dbFields } = module as any;
   const cleanedFields = cleanUuidFields(dbFields);
   const snakeCaseFields = toSnakeCase(cleanedFields);
   
