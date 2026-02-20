@@ -25,6 +25,9 @@ const SiteManagement: React.FC = () => {
 
     // Hydrate sites with full zone objects
     const hydratedSites = useMemo(() => {
+        if (!sites || !Array.isArray(sites)) return [];
+        if (!zones || !Array.isArray(zones)) return sites;
+        
         return sites.map(site => {
             if (!site.zones || !Array.isArray(site.zones)) return site;
             
@@ -207,7 +210,7 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
             if (hydratedZones.length > 0 && typeof hydratedZones[0] === 'string') {
                 // Zones are IDs, hydrate them
                 hydratedZones = hydratedZones
-                    .map((zoneId: any) => zones.find(z => z.id === zoneId))
+                    .map((zoneId: any) => (zones || []).find(z => z.id === zoneId))
                     .filter((z: any) => z !== undefined);
             }
             
@@ -246,7 +249,7 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
             return '';
         }
 
-        const existingCodes = new Set(sites.map(s => s.code));
+        const existingCodes = new Set((sites || []).map(s => s.code));
 
         // Generate all ordered 3-letter combinations
         // e.g. PARIS -> PAR, PAI, PAS, PRI, PRS, PIS, ARI, ARS...
@@ -382,7 +385,7 @@ const SiteFormModal: React.FC<{ isOpen: boolean, onClose: () => void, site: Site
                     />
                     <Select label={t('manager')} value={formData.managerId} onChange={e => setFormData({...formData, managerId: e.target.value})}>
                         <option value="">{t('noManager')}</option>
-                        {employees.map(e => <option key={e.id} value={e.id}>{e.firstName} {e.lastName}</option>)}
+                        {(employees || []).map(e => <option key={e.id} value={e.id}>{e.firstName} {e.lastName}</option>)}
                     </Select>
                 </div>
                 
