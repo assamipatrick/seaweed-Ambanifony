@@ -30,9 +30,10 @@ export async function fetchSites(): Promise<Site[]> {
 }
 
 export async function addSite(site: Omit<Site, 'id'>): Promise<Site | null> {
-  // Remove fields not in Supabase DB schema
+  // Remove fields not in Supabase DB schema and convert to snake_case
   const { zones, ...dbFields } = site as any;
-  const newSite = { id: generateId(), ...dbFields };
+  const snakeCaseFields = toSnakeCase(dbFields);
+  const newSite = { id: generateId(), ...snakeCaseFields };
   
   const { data, error } = await supabase.from('sites').insert([newSite]).select().single();
   if (error) return handleSupabaseError(error, 'addSite');
@@ -40,13 +41,14 @@ export async function addSite(site: Omit<Site, 'id'>): Promise<Site | null> {
 }
 
 export async function updateSite(site: Site): Promise<Site | null> {
-  // Remove fields not in Supabase DB schema
-  const { zones, ...dbFields } = site as any;
+  // Remove fields not in Supabase DB schema and convert to snake_case
+  const { id, zones, ...dbFields } = site as any;
+  const snakeCaseFields = toSnakeCase(dbFields);
   
   const { data, error } = await supabase
     .from('sites')
-    .update(dbFields)
-    .eq('id', site.id)
+    .update(snakeCaseFields)
+    .eq('id', id)
     .select()
     .single();
   if (error) return handleSupabaseError(error, 'updateSite');
