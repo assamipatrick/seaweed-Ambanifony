@@ -275,6 +275,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [repayments, setRepayments] = useState<Repayment[]>(() => loadFromStorage('repayments', []));
   const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment[]>(() => loadFromStorage('monthlyPayments', []));
   const [seaweedTypes, setSeaweedTypes] = useState<SeaweedType[]>(() => loadFromStorage('seaweedTypes', []));
+  const [zones, setZones] = useState<Zone[]>(() => loadFromStorage('zones', []));
   const [modules, setModules] = useState<Module[]>(() => loadFromStorage('modules', []));
   const [cultivationCycles, setCultivationCycles] = useState<CultivationCycle[]>(() => loadFromStorage('cultivationCycles', []));
   const [stockMovements, setStockMovements] = useState<StockMovement[]>(() => loadFromStorage('stockMovements', []));
@@ -298,11 +299,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const seedInitialized = useRef(false);
 
   // ========== FIREBASE REAL-TIME SYNC ==========
-  // Sync ALL 26 collections with Firebase Realtime Database
+  // Sync ALL 27 collections with Firebase Realtime Database
   useFirebaseSync({
     collections: [
       // Core entities
       { collectionName: 'sites', data: sites, setData: setSites },
+      { collectionName: 'zones', data: zones, setData: setZones },
       { collectionName: 'employees', data: employees, setData: setEmployees },
       { collectionName: 'farmers', data: farmers, setData: setFarmers },
       { collectionName: 'service_providers', data: serviceProviders, setData: setServiceProviders },
@@ -336,6 +338,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // System
       { collectionName: 'users', data: users, setData: setUsers },
+      { collectionName: 'roles', data: roles, setData: setRoles },
       { collectionName: 'invitations', data: invitations, setData: setInvitations },
       { collectionName: 'message_logs', data: messageLogs, setData: setMessageLogs },
       { collectionName: 'gallery_photos', data: galleryPhotos, setData: setGalleryPhotos }
@@ -344,6 +347,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   // Keep localStorage as fallback cache
   useEffect(() => { localStorage.setItem('sites', JSON.stringify(sites)); }, [sites]);
+  useEffect(() => { localStorage.setItem('zones', JSON.stringify(zones)); }, [zones]);
   useEffect(() => { localStorage.setItem('employees', JSON.stringify(employees)); }, [employees]);
   useEffect(() => { localStorage.setItem('farmers', JSON.stringify(farmers)); }, [farmers]);
   useEffect(() => { localStorage.setItem('serviceProviders', JSON.stringify(serviceProviders)); }, [serviceProviders]);
