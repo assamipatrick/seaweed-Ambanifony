@@ -7,6 +7,7 @@ import { DataProvider } from './contexts/DataContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { PERMISSIONS } from './permissions';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import MainLayout from './components/layout/MainLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -53,17 +54,19 @@ import TermsOfUse from './pages/TermsOfUse';
 
 const App: React.FC = () => {
   return (
-    <SettingsProvider>
-      <LocalizationProvider>
-        <DataProvider>
-          <NotificationProvider>
-            <AuthProvider>
-              <AppRouter />
-            </AuthProvider>
-          </NotificationProvider>
-        </DataProvider>
-      </LocalizationProvider>
-    </SettingsProvider>
+    <ErrorBoundary>
+      <SettingsProvider>
+        <LocalizationProvider>
+          <DataProvider>
+            <NotificationProvider>
+              <AuthProvider>
+                <AppRouter />
+              </AuthProvider>
+            </NotificationProvider>
+          </DataProvider>
+        </LocalizationProvider>
+      </SettingsProvider>
+    </ErrorBoundary>
   );
 };
 
@@ -97,11 +100,11 @@ const AppRouter: React.FC = () => {
           </Route>
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.OPERATIONS_VIEW} />}>
-            <Route path="/sites" element={<SiteManagement />} />
-            <Route path="/sites/:siteId/cultivation" element={<SiteCultivationCycles />} />
-            <Route path="/seaweed-types" element={<SeaweedTypeManagement />} />
-            <Route path="/seaweed-types/:typeId/cultivation" element={<SeaweedTypeCultivationCycles />} />
-            <Route path="/modules" element={<ModuleTracking />} />
+            <Route path="/sites" element={<ErrorBoundary><SiteManagement /></ErrorBoundary>} />
+            <Route path="/sites/:siteId/cultivation" element={<ErrorBoundary><SiteCultivationCycles /></ErrorBoundary>} />
+            <Route path="/seaweed-types" element={<ErrorBoundary><SeaweedTypeManagement /></ErrorBoundary>} />
+            <Route path="/seaweed-types/:typeId/cultivation" element={<ErrorBoundary><SeaweedTypeCultivationCycles /></ErrorBoundary>} />
+            <Route path="/modules" element={<ErrorBoundary><ModuleTracking /></ErrorBoundary>} />
             <Route path="/operations/cutting" element={<CuttingOperations />} />
             <Route path="/operations/map" element={<FarmMap />} />
             <Route path="/operations/calendar" element={<OperationalCalendar />} />

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug SeaFarm - Sites Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2563eb; }
+        h2 { color: #1e40af; margin-top: 20px; }
+        .status { 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .warning { background: #fef3c7; color: #92400e; }
+        .info { background: #dbeafe; color: #1e40af; }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #1d4ed8; }
+        pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .test-result {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-left: 4px solid #2563eb;
+            margin: 10px 0;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e5e7eb;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug SeaFarm - Sites Page Issue</h1>
+        <p>This page helps diagnose why the Sites page shows a white screen.</p>
+    </div>
+
+    <div class="container">
+        <h2>📋 Test Steps</h2>
+        <div id="steps">
+            <div class="test-result">
+                <span id="step1-status">⏳</span>
+                <span>Step 1: Load the application</span>
+            </div>
+            <div class="test-result">
+                <span id="step2-status">⏳</span>
+                <span>Step 2: Login as admin</span>
+            </div>
+            <div class="test-result">
+                <span id="step3-status">⏳</span>
+                <span>Step 3: Navigate to Sites page</span>
+            </div>
+            <div class="test-result">
+                <span id="step4-status">⏳</span>
+                <span>Step 4: Check for errors</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎬 Actions</h2>
+        <button onclick="startTest()">▶️ Start Automated Test</button>
+        <button onclick="openInNewTab()">🔗 Open Sites Page in New Tab</button>
+        <button onclick="checkConsole()">🐛 Check Console Logs</button>
+        <button onclick="clearLogs()">🧹 Clear Logs</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <div class="container">
+        <h2>🖥️ Live Preview (after login)</h2>
+        <p class="info status">
+            ℹ️ The iframe below will show the Sites page after you login manually.
+        </p>
+        <button onclick="loadSitesInIframe()">Load Sites Page in Iframe</button>
+        <div style="margin-top: 10px;">
+            <iframe id="previewFrame" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📝 Console Logs</h2>
+        <div id="logs" style="max-height: 400px; overflow-y: auto;">
+            <pre id="logContent">No logs yet. Click "Check Console Logs" to start monitoring.</pre>
+        </div>
+    </div>
+
+    <script>
+        const APP_URL = 'https://3000-iw1hbfa3ilo0b15qntvdt-3844e1b6.sandbox.novita.ai';
+        const logs = [];
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push({ timestamp, message, type });
+            updateLogDisplay();
+        }
+
+        function updateLogDisplay() {
+            const logContent = document.getElementById('logContent');
+            logContent.textContent = logs.map(l => 
+                `[${l.timestamp}] [${l.type.toUpperCase()}] ${l.message}`
+            ).join('\n');
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function clearLogs() {
+            logs.length = 0;
+            updateLogDisplay();
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function setStepStatus(step, status) {
+            const emoji = status === 'success' ? '✅' : 
+                         status === 'error' ? '❌' : 
+                         status === 'running' ? '⏳' : '⏸️';
+            document.getElementById(`step${step}-status`).textContent = emoji;
+        }
+
+        function showResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${title}</strong><br>${content}`;
+            results.appendChild(div);
+        }
+
+        async function startTest() {
+            clearLogs();
+            addLog('Starting automated test...', 'info');
+            
+            // Step 1: Check if app loads
+            setStepStatus(1, 'running');
+            try {
+                const response = await fetch(APP_URL);
+                if (response.ok) {
+                    addLog('✅ Application loaded successfully', 'success');
+                    setStepStatus(1, 'success');
+                    showResult('Step 1: Load', 'Application is accessible', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                addLog(`❌ Failed to load application: ${error.message}`, 'error');
+                setStepStatus(1, 'error');
+                showResult('Step 1: Load', `Error: ${error.message}`, 'error');
+                return;
+            }
+
+            // Step 2: Check authentication
+            setStepStatus(2, 'running');
+            addLog('⚠️ Step 2 requires manual login', 'warning');
+            showResult('Step 2: Login', 'Please login manually in the iframe below', 'warning');
+            setStepStatus(2, 'pending');
+
+            // Step 3: Sites page
+            setStepStatus(3, 'running');
+            addLog('Checking Sites page URL...', 'info');
+            const sitesUrl = `${APP_URL}/#/sites`;
+            addLog(`Sites URL: ${sitesUrl}`, 'info');
+            showResult('Step 3: Navigate', `Sites page URL: <a href="${sitesUrl}" target="_blank">${sitesUrl}</a>`, 'info');
+            setStepStatus(3, 'pending');
+
+            // Step 4: Errors
+            setStepStatus(4, 'running');
+            addLog('To check for errors, open the Sites page and check browser console (F12)', 'warning');
+            showResult('Step 4: Errors', 'Open browser console (F12) and navigate to Sites page to see errors', 'warning');
+            setStepStatus(4, 'pending');
+        }
+
+        function openInNewTab() {
+            const sitesUrl = `${APP_URL}/#/sites`;
+            window.open(sitesUrl, '_blank');
+            addLog(`Opened Sites page in new tab: ${sitesUrl}`, 'info');
+        }
+
+        function loadSitesInIframe() {
+            const iframe = document.getElementById('previewFrame');
+            const sitesUrl = `${APP_URL}/#/sites`;
+            iframe.src = sitesUrl;
+            addLog(`Loading Sites page in iframe: ${sitesUrl}`, 'info');
+            showResult('Iframe Load', 'Sites page loaded in iframe below. Login if needed.', 'info');
+        }
+
+        function checkConsole() {
+            addLog('Monitoring browser console...', 'info');
+            showResult('Console Monitor', 'Capturing console logs. Use your browser DevTools (F12) for real-time monitoring.', 'info');
+            
+            // Capture console methods
+            const originalConsole = {
+                log: console.log,
+                error: console.error,
+                warn: console.warn
+            };
+
+            console.log = function(...args) {
+                addLog(args.join(' '), 'log');
+                originalConsole.log.apply(console, args);
+            };
+
+            console.error = function(...args) {
+                addLog(args.join(' '), 'error');
+                originalConsole.error.apply(console, args);
+            };
+
+            console.warn = function(...args) {
+                addLog(args.join(' '), 'warning');
+                originalConsole.warn.apply(console, args);
+            };
+        }
+
+        // Auto-start on page load
+        window.addEventListener('load', () => {
+            addLog('Debug page loaded', 'info');
+            showResult('Ready', 'Click "Start Automated Test" to begin diagnostics', 'info');
+        });
+    </script>
+</body>
+</html>
