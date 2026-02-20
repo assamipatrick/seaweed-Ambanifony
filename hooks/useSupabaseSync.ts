@@ -66,7 +66,13 @@ export function useSupabaseSync<T extends { id: string }>({
 
       if (data && data.length > 0) {
         console.log(`[${table}] Loaded ${data.length} records from Supabase`);
-        setLocalData(data as T[]);
+        
+        // Normalize sites data: add zones array if missing
+        const normalizedData = table === 'sites' 
+          ? data.map(item => ({ ...item, zones: item.zones || [] }))
+          : data;
+        
+        setLocalData(normalizedData as T[]);
       } else {
         console.log(`[${table}] No data in Supabase, keeping local data`);
       }
@@ -99,19 +105,27 @@ export function useSupabaseSync<T extends { id: string }>({
         (payload) => {
           console.log(`[${table}] Real-time change:`, payload);
 
+          // Normalize data: add zones array for sites if missing
+          const normalizeItem = (item: any) => {
+            if (table === 'sites' && item) {
+              return { ...item, zones: item.zones || [] };
+            }
+            return item;
+          };
+
           switch (payload.eventType) {
             case 'INSERT':
               setLocalData((prev) => {
                 const exists = prev.some((item) => item.id === payload.new.id);
                 if (exists) return prev;
-                return [...prev, payload.new as T];
+                return [...prev, normalizeItem(payload.new) as T];
               });
               break;
 
             case 'UPDATE':
               setLocalData((prev) =>
                 prev.map((item) =>
-                  item.id === payload.new.id ? (payload.new as T) : item
+                  item.id === payload.new.id ? (normalizeItem(payload.new) as T) : item
                 )
               );
               break;
