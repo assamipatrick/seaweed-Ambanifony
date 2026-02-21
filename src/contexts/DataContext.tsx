@@ -817,7 +817,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addCultivationCycle({ ...cycleData, cuttingOperationId: opId }, beneficiaryFarmerId);
   };
   
-  const addStockMovement = (movement: Omit<StockMovement, 'id'>) => setStockMovements(prev => [...prev, { ...movement, id: `sm-${Date.now()}`}]);
+  const addStockMovement = async (movement: Omit<StockMovement, 'id'>) => {
+    const temp = { ...movement, id: `sm-${Date.now()}` };
+    setStockMovements(prev => [...prev, temp]);
+    const result = await firebaseService.addStockMovement(movement);
+    if (result) {
+      setStockMovements(prev => prev.map(m => m.id === temp.id ? result : m));
+    } else {
+      setStockMovements(prev => prev.filter(m => m.id !== temp.id));
+    }
+  };
   const addMultipleStockMovements = (movements: Omit<StockMovement, 'id'>[]) => setStockMovements(prev => [...prev, ...movements.map(m => ({ ...m, id: `sm-${Date.now()}-${Math.random()}` }))]);
 
   const recordReturnFromPressing = (data: { date: string; siteId: string; seaweedTypeId: string; designation: string; kg: number; bags: number; pressingSlipId: string; }) => {
@@ -825,23 +834,34 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPressedStockMovements(prev => [...prev, { id: `psm-${Date.now()}`, date: data.date, siteId: 'pressing-warehouse', seaweedTypeId: data.seaweedTypeId, type: PressedStockMovementType.RETURN_TO_SITE, designation: `Return to site: ${sites.find(s => s.id === data.siteId)?.name || data.siteId}`, outBales: data.bags, outKg: data.kg, relatedId: data.pressingSlipId }]);
   };
 
-  const addFarmerDelivery = (data: Omit<FarmerDelivery, 'id' | 'slipNo'>) => {
+  const addFarmerDelivery = async (data: Omit<FarmerDelivery, 'id' | 'slipNo'>) => {
     const slipNo = `DEL-${new Date().getFullYear()}-${String(farmerDeliveries.length + 1).padStart(3, '0')}`;
-    const newDelivery: FarmerDelivery = { ...data, id: `fd-${Date.now()}`, slipNo };
-    setFarmerDeliveries(prev => [...prev, newDelivery]);
+    const tempDelivery: FarmerDelivery = { ...data, id: `fd-${Date.now()}`, slipNo };
+    setFarmerDeliveries(prev => [...prev, tempDelivery]);
     const farmer = farmers.find(f => f.id === data.farmerId);
     const designation = `Delivery from ${farmer?.firstName || ''} ${farmer?.lastName || ''} (${slipNo})`;
-    if (data.destination === 'PRESSING_WAREHOUSE_BULK') {
-        setPressedStockMovements(prev => [...prev, { id: `psm-${Date.now()}`, date: data.date, siteId: 'pressing-warehouse', seaweedTypeId: data.seaweedTypeId, type: PressedStockMovementType.FARMER_DELIVERY, designation, inKg: data.totalWeightKg, inBales: data.totalBags, relatedId: newDelivery.id }]);
+    
+    // Firebase sync
+    const result = await firebaseService.addFarmerDelivery(tempDelivery);
+    if (result) {
+      setFarmerDeliveries(prev => prev.map(d => d.id === tempDelivery.id ? result : d));
     } else {
-        addStockMovement({ date: data.date, siteId: data.siteId, seaweedTypeId: data.seaweedTypeId, type: StockMovementType.FARMER_DELIVERY, designation, inKg: data.totalWeightKg, inBags: data.totalBags, relatedId: newDelivery.id });
+      setFarmerDeliveries(prev => prev.filter(d => d.id !== tempDelivery.id));
+      return; // Abort if Firebase fails
+    }
+    
+    if (data.destination === 'PRESSING_WAREHOUSE_BULK') {
+        setPressedStockMovements(prev => [...prev, { id: `psm-${Date.now()}`, date: data.date, siteId: 'pressing-warehouse', seaweedTypeId: data.seaweedTypeId, type: PressedStockMovementType.FARMER_DELIVERY, designation, inKg: data.totalWeightKg, inBales: data.totalBags, relatedId: result.id }]);
+    } else {
+        await addStockMovement({ date: data.date, siteId: data.siteId, seaweedTypeId: data.seaweedTypeId, type: StockMovementType.FARMER_DELIVERY, designation, inKg: data.totalWeightKg, inBags: data.totalBags, relatedId: result.id });
     }
   };
 
-  const deleteFarmerDelivery = (deliveryId: string) => {
+  const deleteFarmerDelivery = async (deliveryId: string) => {
     setFarmerDeliveries(prev => prev.filter(d => d.id !== deliveryId));
     setStockMovements(prev => prev.filter(m => m.relatedId !== deliveryId || m.type !== StockMovementType.FARMER_DELIVERY));
     setPressedStockMovements(prev => prev.filter(m => m.relatedId !== deliveryId || m.type !== PressedStockMovementType.FARMER_DELIVERY));
+    await firebaseService.deleteFarmerDelivery(deliveryId);
   };
 
   const addInitialStock = (data: Omit<StockMovement, 'id' | 'type' | 'relatedId'>) => setStockMovements(prev => [...prev, { ...data, id: `sm-${Date.now()}`, type: StockMovementType.INITIAL_STOCK }]);
