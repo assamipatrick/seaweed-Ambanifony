@@ -1424,8 +1424,8 @@ const Page6: FC<any> = ({
                     <table className="w-full border-collapse flex-shrink-0 mb-2 border border-gray-400 table-fixed text-[8px]">
                         <colgroup>
                              <col style={{ width: '25%' }} />
-                             <col style={{ width: '12.5%' }} /> <col style={{ width: '12.5%' }} /> <col style={{ width: '12.5%' }} />
-                             <col style={{ width: '12.5%' }} /> <col style={{ width: '12.5%' }} /> <col style={{ width: '12.5%' }} />
+                             <col style={{ width: '12.5%' }} /><col style={{ width: '12.5%' }} /><col style={{ width: '12.5%' }} />
+                             <col style={{ width: '12.5%' }} /><col style={{ width: '12.5%' }} /><col style={{ width: '12.5%' }} />
                         </colgroup>
                         <thead>
                             <tr>
