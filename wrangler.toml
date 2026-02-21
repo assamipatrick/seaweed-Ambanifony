@@ -1,0 +1,30 @@
+# Cloudflare Pages configuration for SEAFARM MONITOR
+name = "seaweed-ambanifony"
+compatibility_date = "2025-02-21"
+
+[build]
+command = "npm run build"
+cwd = "."
+watch_dirs = ["src"]
+
+[build.upload]
+format = "service-worker"
+dir = "dist"
+
+[[build.upload.rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = true
+
+[[build.upload.rules]]
+type = "Text"
+globs = ["**/*.js"]
+fallthrough = true
+
+[[build.upload.rules]]
+type = "Text"
+globs = ["**/*.css"]
+fallthrough = true
+
+# Environment variables will be set in Cloudflare dashboard
+# Do not commit sensitive values here
