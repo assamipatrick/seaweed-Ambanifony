@@ -12,9 +12,9 @@ import type {
     IncidentSeverity
 } from '../types';
 
-// TEMPORARY FIX: Hardcoded API key as Cloudflare env vars not working
-// TODO: Remove after proper environment variable configuration is fixed
-const apiKey = 'AIzaSyDyOfVl_PUF3uw7ON4n2426NSpzb6ZnlxI';
+// Gemini API is now OPTIONAL - app works without it
+// AI features (narratives, analysis) will be disabled but Firebase CRUD works normally
+const apiKey = '';
 
 // FIX: Only initialize GoogleGenAI if API key is available (prevent crash in production)
 let ai: GoogleGenAI | null = null;
