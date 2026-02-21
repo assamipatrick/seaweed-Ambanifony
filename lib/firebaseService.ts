@@ -72,10 +72,12 @@ export function subscribeToCollection<T>(
     const data = snapshot.val();
     if (data) {
       // Convert Firebase object to array
-      const array = Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      // Preserve the original 'id' field from the data object instead of overwriting with Firebase key
+      const array = Object.keys(data).map(key => {
+        const item = data[key];
+        // If the item already has an id field, use it; otherwise use the Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
       callback(array as T[]);
     } else {
       callback([]);
@@ -95,10 +97,11 @@ export async function fetchSites(): Promise<Site[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -122,10 +125,11 @@ export async function addSite(site: Omit<Site, 'id'>): Promise<Site | null> {
 
 export async function updateSite(site: Site): Promise<Site | null> {
   try {
-    const { id, ...updates } = site;
     const siteRef = ref(database, `sites/${id}`);
     
-    await update(siteRef, updates);
+    
+    // Store the complete object including the id
+    await set(siteRef, site);
     return site;
   } catch (error) {
     return handleFirebaseError(error, 'updateSite');
@@ -152,10 +156,11 @@ export async function fetchEmployees(): Promise<Employee[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -179,10 +184,11 @@ export async function addEmployee(employee: Omit<Employee, 'id'>): Promise<Emplo
 
 export async function updateEmployee(employee: Employee): Promise<Employee | null> {
   try {
-    const { id, ...updates } = employee;
     const employeeRef = ref(database, `employees/${id}`);
     
-    await update(employeeRef, updates);
+    
+    // Store the complete object including the id
+    await set(employeeRef, employee);
     return employee;
   } catch (error) {
     return handleFirebaseError(error, 'updateEmployee');
@@ -224,10 +230,11 @@ export async function fetchFarmers(): Promise<Farmer[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -251,10 +258,11 @@ export async function addFarmer(farmer: Omit<Farmer, 'id'>): Promise<Farmer | nu
 
 export async function updateFarmer(farmer: Farmer): Promise<Farmer | null> {
   try {
-    const { id, ...updates } = farmer;
     const farmerRef = ref(database, `farmers/${id}`);
     
-    await update(farmerRef, updates);
+    
+    // Store the complete object including the id
+    await set(farmerRef, farmer);
     return farmer;
   } catch (error) {
     return handleFirebaseError(error, 'updateFarmer');
@@ -281,10 +289,11 @@ export async function fetchServiceProviders(): Promise<ServiceProvider[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -308,10 +317,11 @@ export async function addServiceProvider(provider: Omit<ServiceProvider, 'id'>):
 
 export async function updateServiceProvider(provider: ServiceProvider): Promise<ServiceProvider | null> {
   try {
-    const { id, ...updates } = provider;
     const providerRef = ref(database, `service_providers/${id}`);
     
-    await update(providerRef, updates);
+    
+    // Store the complete object including the id
+    await set(providerRef, provider);
     return provider;
   } catch (error) {
     return handleFirebaseError(error, 'updateServiceProvider');
@@ -338,10 +348,11 @@ export async function fetchCreditTypes(): Promise<CreditType[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -365,10 +376,11 @@ export async function addCreditType(creditType: Omit<CreditType, 'id'>): Promise
 
 export async function updateCreditType(creditType: CreditType): Promise<CreditType | null> {
   try {
-    const { id, ...updates } = creditType;
     const creditTypeRef = ref(database, `credit_types/${id}`);
     
-    await update(creditTypeRef, updates);
+    
+    // Store the complete object including the id
+    await set(creditTypeRef, creditType);
     return creditType;
   } catch (error) {
     return handleFirebaseError(error, 'updateCreditType');
@@ -395,10 +407,11 @@ export async function fetchSeaweedTypes(): Promise<SeaweedType[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -422,10 +435,10 @@ export async function addSeaweedType(seaweedType: Omit<SeaweedType, 'id'>): Prom
 
 export async function updateSeaweedType(seaweedType: SeaweedType): Promise<SeaweedType | null> {
   try {
-    const { id, ...updates } = seaweedType;
-    const seaweedTypeRef = ref(database, `seaweed_types/${id}`);
+    const seaweedTypeRef = ref(database, `seaweed_types/${seaweedType.id}`);
     
-    await update(seaweedTypeRef, updates);
+    // Store the complete object including the id
+    await set(seaweedTypeRef, seaweedType);
     return seaweedType;
   } catch (error) {
     return handleFirebaseError(error, 'updateSeaweedType');
@@ -452,10 +465,11 @@ export async function fetchModules(): Promise<Module[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -479,10 +493,11 @@ export async function addModule(module: Omit<Module, 'id'>): Promise<Module | nu
 
 export async function updateModule(module: Module): Promise<Module | null> {
   try {
-    const { id, ...updates } = module;
     const moduleRef = ref(database, `modules/${id}`);
     
-    await update(moduleRef, updates);
+    
+    // Store the complete object including the id
+    await set(moduleRef, module);
     return module;
   } catch (error) {
     return handleFirebaseError(error, 'updateModule');
@@ -509,10 +524,11 @@ export async function fetchCultivationCycles(): Promise<CultivationCycle[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -536,10 +552,11 @@ export async function addCultivationCycle(cycle: Omit<CultivationCycle, 'id'>): 
 
 export async function updateCultivationCycle(cycle: CultivationCycle): Promise<CultivationCycle | null> {
   try {
-    const { id, ...updates } = cycle;
     const cycleRef = ref(database, `cultivation_cycles/${id}`);
     
-    await update(cycleRef, updates);
+    
+    // Store the complete object including the id
+    await set(cycleRef, cycle);
     return cycle;
   } catch (error) {
     return handleFirebaseError(error, 'updateCultivationCycle');
@@ -566,10 +583,11 @@ export async function fetchZones(): Promise<Zone[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -593,10 +611,11 @@ export async function addZone(zone: Omit<Zone, 'id'>): Promise<Zone | null> {
 
 export async function updateZone(zone: Zone): Promise<Zone | null> {
   try {
-    const { id, ...updates } = zone;
     const zoneRef = ref(database, `zones/${id}`);
     
-    await update(zoneRef, updates);
+    
+    // Store the complete object including the id
+    await set(zoneRef, zone);
     return zone;
   } catch (error) {
     return handleFirebaseError(error, 'updateZone');
@@ -623,10 +642,11 @@ export async function fetchFarmerCredits(): Promise<FarmerCredit[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -650,10 +670,11 @@ export async function addFarmerCredit(credit: Omit<FarmerCredit, 'id'>): Promise
 
 export async function updateFarmerCredit(credit: FarmerCredit): Promise<FarmerCredit | null> {
   try {
-    const { id, ...updates } = credit;
     const creditRef = ref(database, `farmer_credits/${id}`);
     
-    await update(creditRef, updates);
+    
+    // Store the complete object including the id
+    await set(creditRef, credit);
     return credit;
   } catch (error) {
     return handleFirebaseError(error, 'updateFarmerCredit');
@@ -680,10 +701,11 @@ export async function fetchRepayments(): Promise<Repayment[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -707,10 +729,11 @@ export async function addRepayment(repayment: Omit<Repayment, 'id'>): Promise<Re
 
 export async function updateRepayment(repayment: Repayment): Promise<Repayment | null> {
   try {
-    const { id, ...updates } = repayment;
     const repaymentRef = ref(database, `repayments/${id}`);
     
-    await update(repaymentRef, updates);
+    
+    // Store the complete object including the id
+    await set(repaymentRef, repayment);
     return repayment;
   } catch (error) {
     return handleFirebaseError(error, 'updateRepayment');
@@ -737,10 +760,11 @@ export async function fetchMonthlyPayments(): Promise<MonthlyPayment[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -764,10 +788,11 @@ export async function addMonthlyPayment(payment: Omit<MonthlyPayment, 'id'>): Pr
 
 export async function updateMonthlyPayment(payment: MonthlyPayment): Promise<MonthlyPayment | null> {
   try {
-    const { id, ...updates } = payment;
     const paymentRef = ref(database, `monthly_payments/${id}`);
     
-    await update(paymentRef, updates);
+    
+    // Store the complete object including the id
+    await set(paymentRef, payment);
     return payment;
   } catch (error) {
     return handleFirebaseError(error, 'updateMonthlyPayment');
@@ -794,10 +819,11 @@ export async function fetchFarmerDeliveries(): Promise<FarmerDelivery[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -821,10 +847,11 @@ export async function addFarmerDelivery(delivery: Omit<FarmerDelivery, 'id'>): P
 
 export async function updateFarmerDelivery(delivery: FarmerDelivery): Promise<FarmerDelivery | null> {
   try {
-    const { id, ...updates } = delivery;
     const deliveryRef = ref(database, `farmer_deliveries/${id}`);
     
-    await update(deliveryRef, updates);
+    
+    // Store the complete object including the id
+    await set(deliveryRef, delivery);
     return delivery;
   } catch (error) {
     return handleFirebaseError(error, 'updateFarmerDelivery');
@@ -851,10 +878,11 @@ export async function fetchStockMovements(): Promise<StockMovement[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -878,10 +906,11 @@ export async function addStockMovement(movement: Omit<StockMovement, 'id'>): Pro
 
 export async function updateStockMovement(movement: StockMovement): Promise<StockMovement | null> {
   try {
-    const { id, ...updates } = movement;
     const movementRef = ref(database, `stock_movements/${id}`);
     
-    await update(movementRef, updates);
+    
+    // Store the complete object including the id
+    await set(movementRef, movement);
     return movement;
   } catch (error) {
     return handleFirebaseError(error, 'updateStockMovement');
@@ -908,10 +937,11 @@ export async function fetchPressingSlips(): Promise<PressingSlip[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -935,10 +965,11 @@ export async function addPressingSlip(slip: Omit<PressingSlip, 'id'>): Promise<P
 
 export async function updatePressingSlip(slip: PressingSlip): Promise<PressingSlip | null> {
   try {
-    const { id, ...updates } = slip;
     const slipRef = ref(database, `pressing_slips/${id}`);
     
-    await update(slipRef, updates);
+    
+    // Store the complete object including the id
+    await set(slipRef, slip);
     return slip;
   } catch (error) {
     return handleFirebaseError(error, 'updatePressingSlip');
@@ -965,10 +996,11 @@ export async function fetchPressedStockMovements(): Promise<PressedStockMovement
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -992,10 +1024,11 @@ export async function addPressedStockMovement(movement: Omit<PressedStockMovemen
 
 export async function updatePressedStockMovement(movement: PressedStockMovement): Promise<PressedStockMovement | null> {
   try {
-    const { id, ...updates } = movement;
     const movementRef = ref(database, `pressed_stock_movements/${id}`);
     
-    await update(movementRef, updates);
+    
+    // Store the complete object including the id
+    await set(movementRef, movement);
     return movement;
   } catch (error) {
     return handleFirebaseError(error, 'updatePressedStockMovement');
@@ -1022,10 +1055,11 @@ export async function fetchCuttingOperations(): Promise<CuttingOperation[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1049,10 +1083,11 @@ export async function addCuttingOperation(operation: Omit<CuttingOperation, 'id'
 
 export async function updateCuttingOperation(operation: CuttingOperation): Promise<CuttingOperation | null> {
   try {
-    const { id, ...updates } = operation;
     const operationRef = ref(database, `cutting_operations/${id}`);
     
-    await update(operationRef, updates);
+    
+    // Store the complete object including the id
+    await set(operationRef, operation);
     return operation;
   } catch (error) {
     return handleFirebaseError(error, 'updateCuttingOperation');
@@ -1079,10 +1114,11 @@ export async function fetchExportDocuments(): Promise<ExportDocument[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1106,10 +1142,11 @@ export async function addExportDocument(doc: Omit<ExportDocument, 'id'>): Promis
 
 export async function updateExportDocument(doc: ExportDocument): Promise<ExportDocument | null> {
   try {
-    const { id, ...updates } = doc;
     const docRef = ref(database, `export_documents/${id}`);
     
-    await update(docRef, updates);
+    
+    // Store the complete object including the id
+    await set(docRef, doc);
     return doc;
   } catch (error) {
     return handleFirebaseError(error, 'updateExportDocument');
@@ -1136,10 +1173,11 @@ export async function fetchSiteTransfers(): Promise<SiteTransfer[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1163,10 +1201,11 @@ export async function addSiteTransfer(transfer: Omit<SiteTransfer, 'id'>): Promi
 
 export async function updateSiteTransfer(transfer: SiteTransfer): Promise<SiteTransfer | null> {
   try {
-    const { id, ...updates } = transfer;
     const transferRef = ref(database, `site_transfers/${id}`);
     
-    await update(transferRef, updates);
+    
+    // Store the complete object including the id
+    await set(transferRef, transfer);
     return transfer;
   } catch (error) {
     return handleFirebaseError(error, 'updateSiteTransfer');
@@ -1193,10 +1232,11 @@ export async function fetchIncidents(): Promise<Incident[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1220,10 +1260,11 @@ export async function addIncident(incident: Omit<Incident, 'id'>): Promise<Incid
 
 export async function updateIncident(incident: Incident): Promise<Incident | null> {
   try {
-    const { id, ...updates } = incident;
     const incidentRef = ref(database, `incidents/${id}`);
     
-    await update(incidentRef, updates);
+    
+    // Store the complete object including the id
+    await set(incidentRef, incident);
     return incident;
   } catch (error) {
     return handleFirebaseError(error, 'updateIncident');
@@ -1250,10 +1291,11 @@ export async function fetchPeriodicTests(): Promise<PeriodicTest[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1277,10 +1319,11 @@ export async function addPeriodicTest(test: Omit<PeriodicTest, 'id'>): Promise<P
 
 export async function updatePeriodicTest(test: PeriodicTest): Promise<PeriodicTest | null> {
   try {
-    const { id, ...updates } = test;
     const testRef = ref(database, `periodic_tests/${id}`);
     
-    await update(testRef, updates);
+    
+    // Store the complete object including the id
+    await set(testRef, test);
     return test;
   } catch (error) {
     return handleFirebaseError(error, 'updatePeriodicTest');
@@ -1307,10 +1350,11 @@ export async function fetchPestObservations(): Promise<PestObservation[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1334,10 +1378,11 @@ export async function addPestObservation(observation: Omit<PestObservation, 'id'
 
 export async function updatePestObservation(observation: PestObservation): Promise<PestObservation | null> {
   try {
-    const { id, ...updates } = observation;
     const observationRef = ref(database, `pest_observations/${id}`);
     
-    await update(observationRef, updates);
+    
+    // Store the complete object including the id
+    await set(observationRef, observation);
     return observation;
   } catch (error) {
     return handleFirebaseError(error, 'updatePestObservation');
@@ -1364,10 +1409,11 @@ export async function fetchUsers(): Promise<User[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1391,10 +1437,11 @@ export async function addUser(user: Omit<User, 'id'>): Promise<User | null> {
 
 export async function updateUser(user: User): Promise<User | null> {
   try {
-    const { id, ...updates } = user;
     const userRef = ref(database, `users/${id}`);
     
-    await update(userRef, updates);
+    
+    // Store the complete object including the id
+    await set(userRef, user);
     return user;
   } catch (error) {
     return handleFirebaseError(error, 'updateUser');
@@ -1421,10 +1468,11 @@ export async function fetchRoles(): Promise<Role[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1448,10 +1496,11 @@ export async function addRole(role: Omit<Role, 'id'>): Promise<Role | null> {
 
 export async function updateRole(role: Role): Promise<Role | null> {
   try {
-    const { id, ...updates } = role;
     const roleRef = ref(database, `roles/${id}`);
     
-    await update(roleRef, updates);
+    
+    // Store the complete object including the id
+    await set(roleRef, role);
     return role;
   } catch (error) {
     return handleFirebaseError(error, 'updateRole');
@@ -1478,10 +1527,11 @@ export async function fetchInvitations(): Promise<Invitation[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1505,10 +1555,11 @@ export async function addInvitation(invitation: Omit<Invitation, 'id'>): Promise
 
 export async function updateInvitation(invitation: Invitation): Promise<Invitation | null> {
   try {
-    const { id, ...updates } = invitation;
     const invitationRef = ref(database, `invitations/${id}`);
     
-    await update(invitationRef, updates);
+    
+    // Store the complete object including the id
+    await set(invitationRef, invitation);
     return invitation;
   } catch (error) {
     return handleFirebaseError(error, 'updateInvitation');
@@ -1535,10 +1586,11 @@ export async function fetchMessageLogs(): Promise<MessageLog[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1562,10 +1614,11 @@ export async function addMessageLog(log: Omit<MessageLog, 'id'>): Promise<Messag
 
 export async function updateMessageLog(log: MessageLog): Promise<MessageLog | null> {
   try {
-    const { id, ...updates } = log;
     const logRef = ref(database, `message_logs/${id}`);
     
-    await update(logRef, updates);
+    
+    // Store the complete object including the id
+    await set(logRef, log);
     return log;
   } catch (error) {
     return handleFirebaseError(error, 'updateMessageLog');
@@ -1592,10 +1645,11 @@ export async function fetchGalleryPhotos(): Promise<GalleryPhoto[]> {
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-      }));
+      return Object.keys(data).map(key => {
+        const item = data[key];
+        // Preserve the original 'id' field if it exists, otherwise use Firebase key
+        return item.id ? item : { id: key, ...item };
+      });
     }
     return [];
   } catch (error) {
@@ -1619,10 +1673,11 @@ export async function addGalleryPhoto(photo: Omit<GalleryPhoto, 'id'>): Promise<
 
 export async function updateGalleryPhoto(photo: GalleryPhoto): Promise<GalleryPhoto | null> {
   try {
-    const { id, ...updates } = photo;
     const photoRef = ref(database, `gallery_photos/${id}`);
     
-    await update(photoRef, updates);
+    
+    // Store the complete object including the id
+    await set(photoRef, photo);
     return photo;
   } catch (error) {
     return handleFirebaseError(error, 'updateGalleryPhoto');
