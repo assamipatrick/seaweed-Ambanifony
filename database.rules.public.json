@@ -1,0 +1,118 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    
+    "sites": {
+      ".indexOn": ["code", "name"]
+    },
+    
+    "employees": {
+      ".indexOn": ["code", "siteId"]
+    },
+    
+    "farmers": {
+      ".indexOn": ["code", "siteId"]
+    },
+    
+    "service_providers": {
+      ".indexOn": ["name"]
+    },
+    
+    "credit_types": {
+      ".indexOn": ["name"]
+    },
+    
+    "seaweed_types": {
+      ".indexOn": ["name"]
+    },
+    
+    "modules": {
+      ".indexOn": ["code", "siteId"]
+    },
+    
+    "cultivation_cycles": {
+      ".indexOn": ["moduleId", "plantedDate"]
+    },
+    
+    "zones": {
+      ".indexOn": ["siteId", "code"]
+    },
+    
+    "farmer_credits": {
+      ".indexOn": ["farmerId", "creditTypeId"]
+    },
+    
+    "repayments": {
+      ".indexOn": ["farmerCreditId", "date"]
+    },
+    
+    "monthly_payments": {
+      ".indexOn": ["farmerCreditId", "monthYear"]
+    },
+    
+    "farmer_deliveries": {
+      ".indexOn": ["farmerId", "date", "siteId"]
+    },
+    
+    "stock_movements": {
+      ".indexOn": ["siteId", "date", "type"]
+    },
+    
+    "pressing_slips": {
+      ".indexOn": ["siteId", "date"]
+    },
+    
+    "pressed_stock_movements": {
+      ".indexOn": ["siteId", "date"]
+    },
+    
+    "cutting_operations": {
+      ".indexOn": ["siteId", "date"]
+    },
+    
+    "export_documents": {
+      ".indexOn": ["date"]
+    },
+    
+    "site_transfers": {
+      ".indexOn": ["fromSiteId", "toSiteId", "date"]
+    },
+    
+    "incidents": {
+      ".indexOn": ["siteId", "date", "type"]
+    },
+    
+    "incident_types": {
+      ".indexOn": ["name"]
+    },
+    
+    "incident_severities": {
+      ".indexOn": ["level"]
+    },
+    
+    "periodic_tests": {
+      ".indexOn": ["siteId", "date"]
+    },
+    
+    "pest_observations": {
+      ".indexOn": ["siteId", "date"]
+    },
+    
+    "users": {
+      ".indexOn": ["email", "role"]
+    },
+    
+    "invitations": {
+      ".indexOn": ["email", "token", "accepted"]
+    },
+    
+    "message_logs": {
+      ".indexOn": ["timestamp", "type"]
+    },
+    
+    "gallery_photos": {
+      ".indexOn": ["siteId", "uploadedAt"]
+    }
+  }
+}
