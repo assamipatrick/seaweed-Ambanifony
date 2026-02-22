@@ -1,7 +1,1 @@
-{
-  "devDependencies": {
-    "tailwindcss": "^2.2.19",
-    "postcss": "^8.4.5",
-    "autoprefixer": "^10.4.2"
-  }
-}
+{\n  "name": "your-package-name",\n  "version": "1.0.0",\n  "scripts": {\n    "build": "tailwindcss build ./src/styles.css -o ./dist/output.css",\n    "watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch"\n  },\n  "dependencies": {\n    "tailwindcss": "^3.0.0",\n    "postcss": "^8.0.0",\n    "autoprefixer": "^10.0.0"\n  },\n  "devDependencies": {\n    "tailwindcss": "^3.0.0",\n    "postcss": "^8.0.0",\n    "autoprefixer": "^10.0.0"\n  },\n  "engines": {\n    "node": "^14.0.0 || ^16.0.0"\n  }\n}
