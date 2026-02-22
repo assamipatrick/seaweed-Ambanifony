@@ -14,7 +14,13 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- ... scripts ... -->
+    <!-- External libraries must be loaded before the React main module -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN2/WXo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@4.2.0/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
