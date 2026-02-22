@@ -37,9 +37,18 @@ export default defineConfig(({ mode }) => {
             // Use content hash only - Vite will generate unique names when content changes
             entryFileNames: `assets/[name]-[hash].js`,
             chunkFileNames: `assets/[name]-[hash].js`,
-            assetFileNames: `assets/[name]-[hash][extname]`
+            assetFileNames: `assets/[name]-[hash][extname]`,
+            // Manual chunks for better code splitting
+            manualChunks: {
+              // Core React libs
+              'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+              // Firebase
+              'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/database'],
+            }
           }
-        }
+        },
+        // Increase chunk size warning limit
+        chunkSizeWarningLimit: 1000,
       }
     };
 });

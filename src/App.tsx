@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { LocalizationProvider } from './contexts/LocalizationContext';
@@ -11,46 +11,54 @@ import { PERMISSIONS } from './permissions';
 import MainLayout from './components/layout/MainLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Dashboard from './pages/Dashboard';
-import Settings from './pages/Settings';
-import SiteManagement from './pages/SiteManagement';
-import FarmerCredits from './pages/FarmerCredits';
-import SeaweedTypeManagement from './pages/SeaweedTypeManagement';
-import { ModuleTracking } from './pages/ModuleTracking';
-import CultivationCycle from './pages/CultivationCycle';
-import HarvestProcessing from './pages/HarvestProcessing';
-import DryingPage from './pages/DryingPage';
-import BaggingPage from './pages/BaggingPage';
-import StockManagement from './inventory/on-site-storage';
-import FarmerManagement from './pages/FarmerManagement';
-import EmployeeManagement from './pages/EmployeeManagement';
-import PressedWarehouse from './inventory/pressed-warehouse';
-import Exports from './pages/Exports';
-import ServiceProviders from './pages/ServiceProviders';
-import FarmerDeliveries from './inventory/farmer-deliveries';
-import CuttingOperations from './pages/CuttingOperations';
-import SiteTransfers from './pages/SiteTransfers';
-import IncidentManagement from './pages/IncidentManagement';
-import IncidentTypeManagement from './pages/IncidentTypeManagement';
-import IncidentSeverityManagement from './pages/IncidentSeverityManagement';
-import DocumentPayments from './pages/DocumentPayments';
-import PeriodicTests from './pages/PeriodicTests';
-import FarmMap from './pages/FarmMap';
-import RoleManagement from './pages/RoleManagement';
-import PayrollCalculator from './pages/PayrollCalculator';
-import SiteCultivationCycles from './pages/SiteCultivationCycles';
-import SeaweedTypeCultivationCycles from './pages/SeaweedTypeCultivationCycles';
-import UserManual from './pages/UserManual';
-import OperationalCalendar from './pages/OperationalCalendar';
-import Reports from './pages/Reports';
-import UserManagement from './pages/UserManagement';
-import UserProfile from './pages/UserProfile';
-import TermsOfUse from './pages/TermsOfUse';
-import CuttingsLedger from './pages/CuttingsLedger'; // Added import
+// Lazy load pages for better code splitting
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Settings = lazy(() => import('./pages/Settings'));
+const SiteManagement = lazy(() => import('./pages/SiteManagement'));
+const FarmerCredits = lazy(() => import('./pages/FarmerCredits'));
+const SeaweedTypeManagement = lazy(() => import('./pages/SeaweedTypeManagement'));
+const ModuleTracking = lazy(() => import('./pages/ModuleTracking').then(m => ({ default: m.ModuleTracking })));
+const CultivationCycle = lazy(() => import('./pages/CultivationCycle'));
+const HarvestProcessing = lazy(() => import('./pages/HarvestProcessing'));
+const DryingPage = lazy(() => import('./pages/DryingPage'));
+const BaggingPage = lazy(() => import('./pages/BaggingPage'));
+const StockManagement = lazy(() => import('./inventory/on-site-storage'));
+const FarmerManagement = lazy(() => import('./pages/FarmerManagement'));
+const EmployeeManagement = lazy(() => import('./pages/EmployeeManagement'));
+const PressedWarehouse = lazy(() => import('./inventory/pressed-warehouse'));
+const Exports = lazy(() => import('./pages/Exports'));
+const ServiceProviders = lazy(() => import('./pages/ServiceProviders'));
+const FarmerDeliveries = lazy(() => import('./inventory/farmer-deliveries'));
+const CuttingOperations = lazy(() => import('./pages/CuttingOperations'));
+const SiteTransfers = lazy(() => import('./pages/SiteTransfers'));
+const IncidentManagement = lazy(() => import('./pages/IncidentManagement'));
+const IncidentTypeManagement = lazy(() => import('./pages/IncidentTypeManagement'));
+const IncidentSeverityManagement = lazy(() => import('./pages/IncidentSeverityManagement'));
+const DocumentPayments = lazy(() => import('./pages/DocumentPayments'));
+const PeriodicTests = lazy(() => import('./pages/PeriodicTests'));
+const FarmMap = lazy(() => import('./pages/FarmMap'));
+const RoleManagement = lazy(() => import('./pages/RoleManagement'));
+const PayrollCalculator = lazy(() => import('./pages/PayrollCalculator'));
+const SiteCultivationCycles = lazy(() => import('./pages/SiteCultivationCycles'));
+const SeaweedTypeCultivationCycles = lazy(() => import('./pages/SeaweedTypeCultivationCycles'));
+const UserManual = lazy(() => import('./pages/UserManual'));
+const OperationalCalendar = lazy(() => import('./pages/OperationalCalendar'));
+const Reports = lazy(() => import('./pages/Reports'));
+const UserManagement = lazy(() => import('./pages/UserManagement'));
+const UserProfile = lazy(() => import('./pages/UserProfile'));
+const TermsOfUse = lazy(() => import('./pages/TermsOfUse'));
+const CuttingsLedger = lazy(() => import('./pages/CuttingsLedger'));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 const App: React.FC = () => {
   return (
@@ -71,7 +79,8 @@ const App: React.FC = () => {
 const AppRouter: React.FC = () => {
   return (
     <HashRouter>
-      <Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -148,6 +157,7 @@ const AppRouter: React.FC = () => {
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
+      </Suspense>
     </HashRouter>
   );
 };

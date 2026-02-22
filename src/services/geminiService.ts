@@ -14,6 +14,7 @@ import type {
 
 // Gemini API is now OPTIONAL - app works without it
 // AI features (narratives, analysis) will be disabled but Firebase CRUD works normally
+// Build timestamp: 2025-02-21 - Gemini disabled by user request
 const apiKey = '';
 
 // FIX: Only initialize GoogleGenAI if API key is available (prevent crash in production)
